@@ -1,0 +1,4 @@
+# unnecessary
+.idea/
+**/__pycache__/
+.python-version
