@@ -17,6 +17,7 @@ from typing import Optional, Union, Tuple
 def get_activation(name: str) -> nn.Module:
     if name.lower() == 'relu':
         return nn.ReLU()
+    # TODO: test other activations
     else:
         LOG.warning(f'Unrecognized activation function: [bold yellow]{name}[/], fallback to default [bold yellow]ReLU[/].')
         return nn.ReLU()
@@ -72,6 +73,18 @@ class SampleCNN(nn.Module):
                  dropout: float = 0.5):
         """
         Original Sample CNN in PyTorch implementation
+
+        m^n architecture:
+        Constraints     : 1) kernel_size * num_frames = num_samples (e.g. 3 * 19683 = 59049; 9 * 6561 = 59049)
+                          2) m**n = num_frames                      (e.g. 3**9 = 19683; 3**8 = 6561)
+                          3) kernel_size = num_samples / (m**n)     (derived from formula above)
+                          4) layer downscaling ratio = m
+        Explanation: Given an input with 59049 samples and a 3^9-model,
+                     the input will be divided into 19683 frames in the first layer (input head).
+                     In the following module layers, tensor length will be downscaled by m for every layer.
+                     In the last out layer, the output tensor length will be fixed at 1.
+                     Finally, the output tensor will be flattened and a fully connected layer will be used to output classifications.
+
         :param n_class:         number of output tags
         :param m:               filter/kernel size and pooling filter/kernel size of module layers
         :param n:               number of module layers (depth)
@@ -149,8 +162,8 @@ if __name__ == '__main__':
     )
 
     # register hock to print layer shapes
-    for name, mod in model.named_modules():
-        if len(name.split('.')) == 1 and name != '':
+    for mod_name, mod in model.named_modules():
+        if len(mod_name.split('.')) == 1 and mod_name != '':
             mod.register_forward_hook(layer_print_hock)
 
     CONSOLE.print(f'Model summary:\n{model}')
