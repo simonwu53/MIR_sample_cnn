@@ -67,6 +67,7 @@ class SampleCNN(nn.Module):
                  n_class: int = 50,
                  m: int = 3,
                  n: int = 9,
+                 samples_in=59049,
                  module_filters: Tuple[int, ...] = (128, 128, 128, 256, 256, 256, 256, 256, 256, 512, 512),
                  dropout: float = 0.5):
         """
@@ -74,28 +75,39 @@ class SampleCNN(nn.Module):
         :param n_class:         number of output tags
         :param m:               filter/kernel size and pooling filter/kernel size of module layers
         :param n:               number of module layers (depth)
+        :param samples_in:      1d input dimension for raw waveform
         :param module_filters:  list of filter quantity for each module layer
         :param dropout:         dropout rate for the last output before the classifier
         """
         super(SampleCNN, self).__init__()
+        # infer the kernel size and model structure based on m, n, and len_in
+        self.frames = m**n                              # number of frames in the first conv1d to segment the raw waveform
+        assert samples_in % self.frames == 0, \
+            LOG.error(f"Model size mismatch! "
+                      f"Given m^n={m}^{n}={self.frames} frames, can not be divided by number of samples {samples_in}. "
+                      f"Constraint formula: [red]<Samples_in%(m**n)!=0>[/]")
+        kernel_size = samples_in // self.frames
+        stride = kernel_size
+        LOG.info(f'SampleCNN args <n_class={n_class}, m={m}, n={n}, samples_in={samples_in}, module_filters={module_filters}, dropout={dropout}>')
+        # TODO: add support for even kernel size!
+        padding = kernel_size // 2
         assert len(module_filters) == n+2, \
-            LOG.error(f"The size of module filters[{len(module_filters)}] should be 'n+2'=[{n+2}], which includes input, output layers!")
-        # configs
-        self.n = 9
+            LOG.error(f"The size of module filters<len:{len(module_filters)}> should be 'n+2'=<{n+2}>, which includes input, output layers!")
+        self.n = n
 
         # build layers
         for i in range(n+2):
             if i == 0:
                 # input layer
-                setattr(self, 'head', CNNModule(1, module_filters[i], m, m, 0))
+                setattr(self, 'head', CNNModule(1, module_filters[i], kernel_size, stride, 0))
 
             elif i == n+1:
                 # output layer
-                setattr(self, 'out', CNNModule(out_filters, module_filters[i], m, 1, 1))
+                setattr(self, 'out', CNNModule(out_filters, module_filters[i], 1, 1, 0))
 
             else:
                 # module layers
-                setattr(self, f'module_layer_{i}', CNNModule(out_filters, module_filters[i], m, 1, 1, pool_stride=m))
+                setattr(self, f'module_layer_{i}', CNNModule(out_filters, module_filters[i], kernel_size, 1, padding, pool_stride=m))
 
             # out filters for next layer
             out_filters = module_filters[i]
@@ -109,44 +121,46 @@ class SampleCNN(nn.Module):
         return
 
     def forward(self, x):
-        # x shape (B, 1, L)
         x = self.head(x)
-        # x shape (B, 128, L//m)
         for i in range(self.n):
             x = getattr(self, f'module_layer_{i+1}')(x)
-        # x shape (B, 512, L//(m^(n+1))), L//(m^(n+1)) == 1, 3^10=59049
-        drop = self.drop(x)
+        out = self.out(x)
+        drop = self.drop(out)
         flat = drop.flatten(1)
         logits = self.classifier(flat)
         return self.activation(logits)
 
 
-def build_model():
-    # TODO Log model spec here
-
-    # TODO return model, criterion, *others
-    return
-
-
 if __name__ == '__main__':
+    def layer_print_hock(module, inputs, outputs):
+        CONSOLE.print(f'{module.__class__}')
+        CONSOLE.print(f'input shape: [bold red]{inputs[0].shape}[/]')
+        CONSOLE.print(f'output shape: [bold red]{outputs.shape}[/]')
+
     CONSOLE.rule('[bold cyan]Sample CNN moodel test[/]')
     CONSOLE.print('Creating model...')
     model = SampleCNN(
         n_class=50,
         m=3,
         n=9,
+        samples_in=59049,
         module_filters=(128, 128, 128, 256, 256, 256, 256, 256, 256, 512, 512),
         dropout=0.5
     )
+
+    # register hock to print layer shapes
+    for name, mod in model.named_modules():
+        if len(name.split('.')) == 1 and name != '':
+            mod.register_forward_hook(layer_print_hock)
+
     CONSOLE.print(f'Model summary:\n{model}')
     CONSOLE.print('Pushing model to GPU...')
     model.cuda()
 
     # sample inputs
     sample = torch.randn(5, 1, 59049, device='cuda')
-    CONSOLE.print(f'Test input shape: [bold red]{sample.shape}[/]')
 
     # model forward pass
-    out = model(sample)
-    CONSOLE.print(f'Model output shape: [bold red]{out.shape}[/]')
+    output = model(sample)
+
     CONSOLE.print('Test done.')
