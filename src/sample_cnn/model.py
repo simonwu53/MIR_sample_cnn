@@ -130,7 +130,6 @@ class SampleCNN(nn.Module):
                       f"Constraint formula: [red]<Samples_in%(m**n)!=0>[/]")
         kernel_size = samples_in // self.frames
         stride = kernel_size
-        LOG.info(f'SampleCNN args <n_class={n_class}, m={m}, n={n}, samples_in={samples_in}, module_filters={module_filters}, dropout={dropout}>')
         # padding for both odd and even kernel size
         padding = (kernel_size//2-1, kernel_size//2) if kernel_size % 2 == 0 else kernel_size // 2
         assert len(module_filters) == n+2, \
@@ -163,6 +162,8 @@ class SampleCNN(nn.Module):
 
         # name
         self.name = f'{m}^{n} Model with {samples_in} samples' if not name else name
+        LOG.info(f'SampleCNN args <n_class={n_class}, m={m}, n={n}, samples_in={samples_in}, module_filters={module_filters}, dropout={dropout}, '
+                 f'kernel_size={kernel_size}, stride={stride}, padding={padding}>')
         return
 
     def forward(self, x):
@@ -227,7 +228,7 @@ if __name__ == '__main__':
     model.cuda()
 
     # sample inputs
-    sample = torch.randn(5, 1, 59049, device='cuda')
+    sample = torch.randn(5, 1, args.samples_in, device='cuda')
 
     # model forward pass
     CONSOLE.rule('[bold cyan]Forwarding test[/]')
