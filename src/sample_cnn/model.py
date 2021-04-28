@@ -7,20 +7,41 @@ except ModuleNotFoundError as e:
     sys.path.append(Path(__file__).parent.parent.parent.absolute().as_posix())
     from src.utils import LOG, CONSOLE, traceback_install
     traceback_install(console=CONSOLE, show_locals=True)
+from misc import get_activation, count_params
 # libs
 import torch
+import torch.nn.functional as F
 from torch import nn
+import argparse
 # typing
 from typing import Optional, Union, Tuple
 
 
-def get_activation(name: str) -> nn.Module:
-    if name.lower() == 'relu':
-        return nn.ReLU()
-    # TODO: test other activations
-    else:
-        LOG.warning(f'Unrecognized activation function: [bold yellow]{name}[/], fallback to default [bold yellow]ReLU[/].')
-        return nn.ReLU()
+class Padding(nn.Module):
+    def __init__(self, padding: Union[int, Tuple[int, ...]], mode: str = 'constant', value: int = 0):
+        """
+        A wrapper module for padding function
+
+        :param padding: m-elements tuple, where m/2 ≤ input dimensions and m is even
+        :param mode:    'constant', 'reflect', 'replicate' or 'circular'. Default: 'constant'
+        :param value:   fill value for 'constant' padding. Default: 0
+        """
+        super(Padding, self).__init__()
+        self.activated = False if padding == 0 else True
+        self.padding = (padding, padding) if isinstance(padding, int) else padding
+        self.value = value
+        if mode.lower() not in ['constant', 'reflect', 'replicate' or 'circular']:
+            LOG.warning(f"Unexpected padding mode: {mode}, fallback to default mode: 'constant'.")
+            self.mode = 'constant'
+        else:
+            self.mode = mode
+        return
+
+    def forward(self, x):
+        if self.activated:
+            return F.pad(x, self.padding, mode=self.mode, value=self.value)
+        else:
+            return x
 
 
 class CNNModule(nn.Module):
@@ -31,7 +52,8 @@ class CNNModule(nn.Module):
                  stride: Union[int, Tuple[int,...]] = 1,
                  padding: Union[int, Tuple[int,...]] = 1,
                  activation: str = 'relu',
-                 pool_stride: Optional[int] = None) -> None:
+                 pool_stride: Optional[int] = None,
+                 name: str = 'CNNModule') -> None:
         """
         Sample CNN layer module.
         :param len_in:      input num of filters for Conv1d
@@ -41,10 +63,13 @@ class CNNModule(nn.Module):
         :param padding:     padding for Conv1d
         :param activation:  activation function for the layer module
         :param pool_stride: Optional, pooling kernel size and stride if enabled
+        :param name:        Optional, name the module
         """
         super(CNNModule, self).__init__()
+        # padding
+        self.padding = Padding(padding=padding)
         # conv1d
-        self.conv1d = nn.Conv1d(len_in, len_out, kernel_size=kernel_size, stride=stride, padding=padding)
+        self.conv1d = nn.Conv1d(len_in, len_out, kernel_size=kernel_size, stride=stride)
         # batch normalization
         self.norm = nn.BatchNorm1d(len_out)
         # activation
@@ -54,13 +79,15 @@ class CNNModule(nn.Module):
             self.maxpool = nn.MaxPool1d(kernel_size=pool_stride, stride=pool_stride)
         else:
             self.maxpool = None
+        # name
+        self.name = name
         return
 
     def forward(self, x):
         if self.maxpool is None:
-            return self.activate(self.norm(self.conv1d(x)))
+            return self.activate(self.norm(self.conv1d(self.padding(x))))
         else:
-            return self.maxpool(self.activate(self.norm(self.conv1d(x))))
+            return self.maxpool(self.activate(self.norm(self.conv1d(self.padding(x)))))
 
 
 class SampleCNN(nn.Module):
@@ -70,7 +97,8 @@ class SampleCNN(nn.Module):
                  n: int = 9,
                  samples_in=59049,
                  module_filters: Tuple[int, ...] = (128, 128, 128, 256, 256, 256, 256, 256, 256, 512, 512),
-                 dropout: float = 0.5):
+                 dropout: float = 0.5,
+                 name: Optional[str] = None):
         """
         Original Sample CNN in PyTorch implementation
 
@@ -91,6 +119,7 @@ class SampleCNN(nn.Module):
         :param samples_in:      1d input dimension for raw waveform
         :param module_filters:  list of filter quantity for each module layer
         :param dropout:         dropout rate for the last output before the classifier
+        :param name:            Optional, name the module
         """
         super(SampleCNN, self).__init__()
         # infer the kernel size and model structure based on m, n, and len_in
@@ -102,8 +131,8 @@ class SampleCNN(nn.Module):
         kernel_size = samples_in // self.frames
         stride = kernel_size
         LOG.info(f'SampleCNN args <n_class={n_class}, m={m}, n={n}, samples_in={samples_in}, module_filters={module_filters}, dropout={dropout}>')
-        # TODO: add support for even kernel size!
-        padding = kernel_size // 2
+        # padding for both odd and even kernel size
+        padding = (kernel_size//2-1, kernel_size//2) if kernel_size % 2 == 0 else kernel_size // 2
         assert len(module_filters) == n+2, \
             LOG.error(f"The size of module filters<len:{len(module_filters)}> should be 'n+2'=<{n+2}>, which includes input, output layers!")
         self.n = n
@@ -112,15 +141,15 @@ class SampleCNN(nn.Module):
         for i in range(n+2):
             if i == 0:
                 # input layer
-                setattr(self, 'head', CNNModule(1, module_filters[i], kernel_size, stride, 0))
+                setattr(self, 'head', CNNModule(1, module_filters[i], kernel_size, stride, 0, name='head'))
 
             elif i == n+1:
                 # output layer
-                setattr(self, 'out', CNNModule(out_filters, module_filters[i], 1, 1, 0))
+                setattr(self, 'out', CNNModule(out_filters, module_filters[i], 1, 1, 0, name='out'))
 
             else:
                 # module layers
-                setattr(self, f'module_layer_{i}', CNNModule(out_filters, module_filters[i], kernel_size, 1, padding, pool_stride=m))
+                setattr(self, f'module_layer_{i}', CNNModule(out_filters, module_filters[i], kernel_size, 1, padding, pool_stride=m, name=f'module_layer_{i}'))
 
             # out filters for next layer
             out_filters = module_filters[i]
@@ -131,6 +160,9 @@ class SampleCNN(nn.Module):
         # classifier for tags
         self.classifier = nn.Linear(module_filters[-1], n_class)
         self.activation = nn.Sigmoid()
+
+        # name
+        self.name = f'{m}^{n} Model with {samples_in} samples' if not name else name
         return
 
     def forward(self, x):
@@ -144,29 +176,53 @@ class SampleCNN(nn.Module):
         return self.activation(logits)
 
 
+def cnn_arg_parser(p: Optional[argparse.ArgumentParser] = None) -> argparse.ArgumentParser:
+    if not p:
+        p = argparse.ArgumentParser('Sample CNN Sanity Check', add_help=False)
+    p.add_argument('--n_class', default=50, type=int)
+    p.add_argument('--m', default=3, type=int)
+    p.add_argument('--n', default=9, type=int)
+    p.add_argument('--samples_in', default=59049, type=int)
+    p.add_argument('--module_filters', default=[128, 128, 128, 256, 256, 256, 256, 256, 256, 512, 512], type=int, nargs='+')
+    p.add_argument('--dropout', default=0.5, type=float)
+    p.add_argument('--name', type=str)
+    return p
+
+
 if __name__ == '__main__':
     def layer_print_hock(module, inputs, outputs):
-        CONSOLE.print(f'{module.__class__}')
-        CONSOLE.print(f'input shape: [bold red]{inputs[0].shape}[/]')
-        CONSOLE.print(f'output shape: [bold red]{outputs.shape}[/]')
+        if not getattr(module, 'name', 0):
+            CONSOLE.print(f'{module.__class__.__name__}')
+        else:
+            CONSOLE.print(f'{module.name}({module.__class__.__name__})')
+        CONSOLE.print(f'input shape: [bold cyan]{inputs[0].shape}[/]')
+        CONSOLE.print(f'output shape: [bold cyan]{outputs.shape}[/]')
+        CONSOLE.print(f'------------------------------------------')
 
-    CONSOLE.rule('[bold cyan]Sample CNN moodel test[/]')
+    # parse args
+    parser = argparse.ArgumentParser('Sample CNN Sanity Check Script', parents=[cnn_arg_parser()])
+    args = parser.parse_args()
+
+    # build model
+    CONSOLE.rule('[bold cyan]Sample CNN Sanity Check[/]')
     CONSOLE.print('Creating model...')
     model = SampleCNN(
-        n_class=50,
-        m=3,
-        n=9,
-        samples_in=59049,
-        module_filters=(128, 128, 128, 256, 256, 256, 256, 256, 256, 512, 512),
-        dropout=0.5
+        n_class=args.n_class,
+        m=args.m,
+        n=args.n,
+        samples_in=args.samples_in,
+        module_filters=args.module_filters,
+        dropout=args.dropout,
+        name=args.name
     )
+    CONSOLE.print(f'{model.name} summary:\n{model}')
+    CONSOLE.print(f'Total trainable parameters: [bold cyan]{count_params(model)}[/]')
 
     # register hock to print layer shapes
     for mod_name, mod in model.named_modules():
         if len(mod_name.split('.')) == 1 and mod_name != '':
             mod.register_forward_hook(layer_print_hock)
 
-    CONSOLE.print(f'Model summary:\n{model}')
     CONSOLE.print('Pushing model to GPU...')
     model.cuda()
 
@@ -174,6 +230,7 @@ if __name__ == '__main__':
     sample = torch.randn(5, 1, 59049, device='cuda')
 
     # model forward pass
+    CONSOLE.rule('[bold cyan]Forwarding test[/]')
     output = model(sample)
 
     CONSOLE.print('Test done.')
