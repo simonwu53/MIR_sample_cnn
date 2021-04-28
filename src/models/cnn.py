@@ -7,7 +7,7 @@ except ModuleNotFoundError as e:
     sys.path.append(Path(__file__).parent.parent.parent.absolute().as_posix())
     from src.utils import LOG, CONSOLE, traceback_install
     traceback_install(console=CONSOLE, show_locals=True)
-from misc import get_activation, count_params
+from misc import get_activation, count_params, layer_print_hock
 # libs
 import torch
 import torch.nn.functional as F
@@ -191,15 +191,6 @@ def cnn_arg_parser(p: Optional[argparse.ArgumentParser] = None) -> argparse.Argu
 
 
 if __name__ == '__main__':
-    def layer_print_hock(module, inputs, outputs):
-        if not getattr(module, 'name', 0):
-            CONSOLE.print(f'{module.__class__.__name__}')
-        else:
-            CONSOLE.print(f'{module.name}({module.__class__.__name__})')
-        CONSOLE.print(f'input shape: [bold cyan]{inputs[0].shape}[/]')
-        CONSOLE.print(f'output shape: [bold cyan]{outputs.shape}[/]')
-        CONSOLE.print(f'------------------------------------------')
-
     # parse args
     parser = argparse.ArgumentParser('Sample CNN Sanity Check Script', parents=[cnn_arg_parser()])
     args = parser.parse_args()
