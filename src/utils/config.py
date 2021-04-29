@@ -1,6 +1,7 @@
 from pathlib import Path
 from collections import namedtuple
 import logging
+import numpy as np
 from rich.console import Console
 from rich.logging import RichHandler
 from rich.traceback import install
@@ -33,3 +34,7 @@ logging.basicConfig(format='%(message)s',
                     level=logging.INFO,
                     handlers=[handler])
 LOG = logging.getLogger('sample_cnn')
+
+# RANDOM SEEDS (with new practice, use RNG-Random_Number_Generator, which can be used locally)
+_seed = 53
+RNG = np.random.default_rng(_seed)

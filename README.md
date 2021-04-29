@@ -10,6 +10,7 @@ Waveforms*][1]"
 ## Requirements / Dependencies
 * [PyTorch][1] (~1.8.1, CUDA)
 * [Rich][2] (for better console printing, logging, error handling)
+* Pandas (for reading annotations)
 
 
 [1]: https://pytorch.org/
