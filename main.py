@@ -28,6 +28,8 @@ def main_arg_parser() -> argparse.ArgumentParser:
 
 
 def main(args):
+    # reset seeds
+
     # create model
     model, optim = build_model(args)
     return
@@ -35,5 +37,5 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser('Sample CNN Main Utility Script', parents=[main_arg_parser()])
-    args = parser.parse_args()
-    main(args)
+    config = parser.parse_args()
+    main(config)

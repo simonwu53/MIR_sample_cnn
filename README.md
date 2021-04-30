@@ -9,8 +9,9 @@ Waveforms*][1]"
 <a name="requirements"></a>
 ## Requirements / Dependencies
 * [PyTorch][1] (~1.8.1, CUDA)
-* [Rich][2] (for better console printing, logging, error handling)
-* Pandas (for reading annotations)
+* [Rich][2] (better console printing, logging, error handling)
+* Pandas (reading annotations)
+* librosa (audio processing)
 
 
 [1]: https://pytorch.org/

@@ -1,3 +1,4 @@
+from .func import reset_all_seeds
 from pathlib import Path
 from collections import namedtuple
 import logging
@@ -37,4 +38,4 @@ LOG = logging.getLogger('sample_cnn')
 
 # RANDOM SEEDS (with new practice, use RNG-Random_Number_Generator, which can be used locally)
 _seed = 53
-RNG = np.random.default_rng(_seed)
+RNG = reset_all_seeds(_seed)
