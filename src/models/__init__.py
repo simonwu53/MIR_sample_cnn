@@ -1,5 +1,5 @@
 from .cnn import cnn_arg_parser, SampleCNN
-from .misc import get_optimizer
+from .misc import get_optimizer, get_loss
 
 
 def build_model(args):
@@ -13,10 +13,5 @@ def build_model(args):
         dropout=args.dropout,
         name=args.name
     )
-    # create optimizer
-    optim = get_optimizer(model.parameters(), args=args)
-    # TODO create criterion
 
-    # TODO create scheduler
-    # TODO return model, optim, criterion, *others
-    return model, optim
+    return model

@@ -7,7 +7,7 @@ except ModuleNotFoundError as e:
     sys.path.append(Path(__file__).parent.parent.parent.absolute().as_posix())
     from src.utils import LOG, CONSOLE, traceback_install
     traceback_install(console=CONSOLE, show_locals=True)
-from misc import get_activation, count_params, layer_print_hock
+from .misc import _get_activation, count_params, layer_print_hock
 # libs
 import torch
 import torch.nn.functional as F
@@ -73,7 +73,7 @@ class CNNModule(nn.Module):
         # batch normalization
         self.norm = nn.BatchNorm1d(len_out)
         # activation
-        self.activate = get_activation(activation)
+        self.activate = _get_activation(activation)
         # optional max pooling after layer
         if pool_stride is not None:
             self.maxpool = nn.MaxPool1d(kernel_size=pool_stride, stride=pool_stride)

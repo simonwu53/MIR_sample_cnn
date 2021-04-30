@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import torch
+import pandas as pd
 
 
 def get_rng(seed: int) -> np.random.Generator:
@@ -18,3 +19,10 @@ def reset_all_seeds(seed: int) -> np.random.Generator:
     random.seed(seed)
     torch.manual_seed(seed)
     return rng
+
+
+def load_topk_annotations(path: str, reset_index: bool = True) -> pd.DataFrame:
+    df = pd.read_csv(path)
+    if reset_index:
+        df = df.reset_index('clip_id')
+    return df

@@ -4,7 +4,7 @@ import argparse
 from typing import Iterable, Optional
 
 
-def get_activation(name: str) -> Optional[nn.Module]:
+def _get_activation(name: str) -> Optional[nn.Module]:
     if name.lower() == 'relu':
         return nn.ReLU()
     # TODO: test other activations
@@ -15,7 +15,7 @@ def get_activation(name: str) -> Optional[nn.Module]:
 
 def get_optimizer(params: Iterable,
                   args: argparse.Namespace) -> Optional[optim.Optimizer]:
-    name = args.lr_type.lower()
+    name = args.optim_type.lower()
     if name == 'sgd':
         LOG.info(f"SGD Optimizer <lr={args.lr}, momentum={args.momentum}, nesterov=True>")
         return optim.SGD(params=params, lr=args.lr, momentum=args.momentum, nesterov=True)
@@ -28,6 +28,14 @@ def get_optimizer(params: Iterable,
     else:
         LOG.error(f"Unsupported optimizer: [bold red]{name}[/].")
         raise ValueError(f"Unsupported optimizer: {name}.")
+
+
+def get_loss(name: str) -> nn.Module:
+    name = name.lower()
+    if name == 'bce':
+        return nn.BCELoss()
+    else:
+        raise NotImplementedError
 
 
 def count_params(model: nn.Module, only_trainable: bool = True) -> int:
