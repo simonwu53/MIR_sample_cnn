@@ -1,0 +1,176 @@
+(mirproj) shanwu@533s-itx:~/OneDriveUT/projects/MIR_sample_cnn$ python src/data/preprocess.py --n_worker 12
+───────────────────────────────────────────────── Pre-processing MTT Annotations and Data for Machine Learning ──────────────────────────────────────────────────
+[04/30/21 18:11:46] INFO     Target folder (/home/shanwu/OneDriveUT/projects/MIR_sample_cnn/dataset/processed) created.                         preprocess.py:181
+                    INFO     Starting pre-processing MTT annotations, keeping 50 top tags, and merging song info.                               preprocess.py:116
+                    INFO     Loaded annotations from ./dataset/annotations_final.csv, loaded song info from ./dataset/clip_info_final.csv,      preprocess.py:124
+                             which contains 25863 songs.                                                                                                         
+                    INFO     TOP 50 Tags:                                                                                                       preprocess.py:135
+                             ['guitar', 'classical', 'slow', 'techno', 'strings', 'drums', 'electronic', 'rock', 'fast', 'piano', 'ambient',                     
+                             'beat', 'violin', 'vocal', 'synth', 'female', 'indian', 'opera', 'male', 'singing', 'vocals', 'no vocals',                          
+                             'harpsichord', 'loud', 'quiet', 'flute', 'woman', 'male vocal', 'no vocal', 'pop', 'soft', 'sitar', 'solo', 'man',                  
+                             'classic', 'choir', 'voice', 'new age', 'dance', 'female vocal', 'male voice', 'beats', 'harp', 'cello', 'no                        
+                             voice', 'weird', 'country', 'female voice', 'metal', 'choral']                                                                      
+                    INFO     train set size (#audio): 15250.                                                                                    preprocess.py:148
+                    INFO     val set size (#audio): 1529.                                                                                       preprocess.py:148
+                    INFO     test set size (#audio): 4332.                                                                                      preprocess.py:148
+                    INFO     Final quantity of songs: 21111                                                                                     preprocess.py:153
+                             Final columns (55) in the DataFrame:                                                                                                
+                             ['guitar', 'classical', 'slow', 'techno', 'strings', 'drums', 'electronic', 'rock', 'fast', 'piano', 'ambient',                     
+                             'beat', 'violin', 'vocal', 'synth', 'female', 'indian', 'opera', 'male', 'singing', 'vocals', 'no vocals',                          
+                             'harpsichord', 'loud', 'quiet', 'flute', 'woman', 'male vocal', 'no vocal', 'pop', 'soft', 'sitar', 'solo', 'man',                  
+                             'classic', 'choir', 'voice', 'new age', 'dance', 'female vocal', 'male voice', 'beats', 'harp', 'cello', 'no                        
+                             voice', 'weird', 'country', 'female voice', 'metal', 'choral', 'clip_id', 'mp3_path', 'split', 'title', 'artist']                   
+────────────────────────────────────────────────────────────────────── Audio Preprocessing ──────────────────────────────────────────────────────────────────────
+                    INFO     MTT annotations processed. Now segmenting audios based on annotations for machine learning...                      preprocess.py:203
+                    INFO     12 workers created.                                                                                                preprocess.py:224
+[04/30/21 18:11:47] INFO     [Worker 0]: Received 1759 tasks.                                                                                    preprocess.py:34
+[04/30/21 18:11:47] INFO     [Worker 1]: Received 1759 tasks.                                                                                    preprocess.py:34
+[04/30/21 18:11:47] INFO     [Worker 2]: Received 1759 tasks.                                                                                    preprocess.py:34
+[04/30/21 18:11:47] INFO     [Worker 3]: Received 1759 tasks.                                                                                    preprocess.py:34
+[04/30/21 18:11:47] INFO     [Worker 4]: Received 1759 tasks.                                                                                    preprocess.py:34
+[04/30/21 18:11:47] INFO     [Worker 5]: Received 1759 tasks.                                                                                    preprocess.py:34
+[04/30/21 18:11:47] INFO     [Worker 6]: Received 1759 tasks.                                                                                    preprocess.py:34
+[04/30/21 18:11:47] INFO     [Worker 7]: Received 1759 tasks.                                                                                    preprocess.py:34
+[04/30/21 18:11:47] INFO     [Worker 8]: Received 1759 tasks.                                                                                    preprocess.py:34
+[04/30/21 18:11:47] INFO     [Worker 9]: Received 1759 tasks.                                                                                    preprocess.py:34
+[04/30/21 18:11:47] INFO     [Worker 10]: Received 1759 tasks.                                                                                   preprocess.py:34
+[04/30/21 18:11:47] INFO     [Worker 11]: Received 1762 tasks.                                                                                   preprocess.py:34
+[04/30/21 18:14:16] INFO     [Worker 8]: 10% tasks done. (time usage: 2.49 min)                                                                  preprocess.py:63
+[04/30/21 18:14:16] INFO     [Worker 10]: 10% tasks done. (time usage: 2.49 min)                                                                 preprocess.py:63
+[04/30/21 18:14:16] INFO     [Worker 1]: 10% tasks done. (time usage: 2.50 min)                                                                  preprocess.py:63
+[04/30/21 18:14:16] INFO     [Worker 9]: 10% tasks done. (time usage: 2.50 min)                                                                  preprocess.py:63
+[04/30/21 18:14:17] INFO     [Worker 6]: 10% tasks done. (time usage: 2.51 min)                                                                  preprocess.py:63
+[04/30/21 18:14:17] INFO     [Worker 3]: 10% tasks done. (time usage: 2.52 min)                                                                  preprocess.py:63
+[04/30/21 18:14:18] INFO     [Worker 2]: 10% tasks done. (time usage: 2.52 min)                                                                  preprocess.py:63
+[04/30/21 18:14:18] INFO     [Worker 4]: 10% tasks done. (time usage: 2.52 min)                                                                  preprocess.py:63
+[04/30/21 18:14:18] INFO     [Worker 7]: 10% tasks done. (time usage: 2.53 min)                                                                  preprocess.py:63
+[04/30/21 18:14:19] INFO     [Worker 0]: 10% tasks done. (time usage: 2.54 min)                                                                  preprocess.py:63
+[04/30/21 18:14:19] INFO     [Worker 5]: 10% tasks done. (time usage: 2.55 min)                                                                  preprocess.py:63
+[04/30/21 18:14:20] INFO     [Worker 11]: 10% tasks done. (time usage: 2.55 min)                                                                 preprocess.py:63
+[04/30/21 18:16:44] INFO     [Worker 9]: 20% tasks done. (time usage: 4.95 min)                                                                  preprocess.py:63
+[04/30/21 18:16:45] INFO     [Worker 10]: 20% tasks done. (time usage: 4.97 min)                                                                 preprocess.py:63
+[04/30/21 18:16:46] INFO     [Worker 8]: 20% tasks done. (time usage: 4.98 min)                                                                  preprocess.py:63
+[04/30/21 18:16:47] INFO     [Worker 1]: 20% tasks done. (time usage: 5.00 min)                                                                  preprocess.py:63
+[04/30/21 18:16:47] INFO     [Worker 11]: 20% tasks done. (time usage: 5.01 min)                                                                 preprocess.py:63
+[04/30/21 18:16:48] INFO     [Worker 0]: 20% tasks done. (time usage: 5.02 min)                                                                  preprocess.py:63
+[04/30/21 18:16:48] INFO     [Worker 6]: 20% tasks done. (time usage: 5.02 min)                                                                  preprocess.py:63
+[04/30/21 18:16:49] INFO     [Worker 2]: 20% tasks done. (time usage: 5.04 min)                                                                  preprocess.py:63
+[04/30/21 18:16:49] INFO     [Worker 5]: 20% tasks done. (time usage: 5.04 min)                                                                  preprocess.py:63
+[04/30/21 18:16:50] INFO     [Worker 7]: 20% tasks done. (time usage: 5.05 min)                                                                  preprocess.py:63
+[04/30/21 18:16:50] INFO     [Worker 3]: 20% tasks done. (time usage: 5.05 min)                                                                  preprocess.py:63
+[04/30/21 18:16:51] INFO     [Worker 4]: 20% tasks done. (time usage: 5.07 min)                                                                  preprocess.py:63
+[04/30/21 18:19:12] INFO     [Worker 9]: 30% tasks done. (time usage: 7.42 min)                                                                  preprocess.py:63
+[04/30/21 18:19:14] INFO     [Worker 10]: 30% tasks done. (time usage: 7.46 min)                                                                 preprocess.py:63
+[04/30/21 18:19:15] INFO     [Worker 8]: 30% tasks done. (time usage: 7.47 min)                                                                  preprocess.py:63
+[04/30/21 18:19:15] INFO     [Worker 1]: 30% tasks done. (time usage: 7.48 min)                                                                  preprocess.py:63
+[04/30/21 18:19:17] INFO     [Worker 3]: 30% tasks done. (time usage: 7.50 min)                                                                  preprocess.py:63
+[04/30/21 18:19:18] INFO     [Worker 6]: 30% tasks done. (time usage: 7.53 min)                                                                  preprocess.py:63
+[04/30/21 18:19:19] INFO     [Worker 11]: 30% tasks done. (time usage: 7.55 min)                                                                 preprocess.py:63
+[04/30/21 18:19:20] INFO     [Worker 2]: 30% tasks done. (time usage: 7.55 min)                                                                  preprocess.py:63
+[04/30/21 18:19:20] INFO     [Worker 0]: 30% tasks done. (time usage: 7.56 min)                                                                  preprocess.py:63
+[04/30/21 18:19:20] INFO     [Worker 5]: 30% tasks done. (time usage: 7.56 min)                                                                  preprocess.py:63
+[04/30/21 18:19:22] INFO     [Worker 4]: 30% tasks done. (time usage: 7.60 min)                                                                  preprocess.py:63
+[04/30/21 18:19:23] INFO     [Worker 7]: 30% tasks done. (time usage: 7.62 min)                                                                  preprocess.py:63
+[04/30/21 18:21:42] INFO     [Worker 9]: 40% tasks done. (time usage: 9.92 min)                                                                  preprocess.py:63
+[04/30/21 18:21:45] INFO     [Worker 10]: 40% tasks done. (time usage: 9.98 min)                                                                 preprocess.py:63
+[04/30/21 18:21:48] INFO     [Worker 8]: 40% tasks done. (time usage: 10.03 min)                                                                 preprocess.py:63
+[04/30/21 18:21:48] INFO     [Worker 3]: 40% tasks done. (time usage: 10.03 min)                                                                 preprocess.py:63
+[04/30/21 18:21:49] INFO     [Worker 11]: 40% tasks done. (time usage: 10.04 min)                                                                preprocess.py:63
+[04/30/21 18:21:50] INFO     [Worker 6]: 40% tasks done. (time usage: 10.05 min)                                                                 preprocess.py:63
+[04/30/21 18:21:50] INFO     [Worker 1]: 40% tasks done. (time usage: 10.06 min)                                                                 preprocess.py:63
+[04/30/21 18:21:52] INFO     [Worker 2]: 40% tasks done. (time usage: 10.09 min)                                                                 preprocess.py:63
+[04/30/21 18:21:55] INFO     [Worker 5]: 40% tasks done. (time usage: 10.14 min)                                                                 preprocess.py:63
+[04/30/21 18:21:55] INFO     [Worker 0]: 40% tasks done. (time usage: 10.15 min)                                                                 preprocess.py:63
+[04/30/21 18:21:56] INFO     [Worker 7]: 40% tasks done. (time usage: 10.16 min)                                                                 preprocess.py:63
+[04/30/21 18:21:56] INFO     [Worker 4]: 40% tasks done. (time usage: 10.16 min)                                                                 preprocess.py:63
+[04/30/21 18:24:04] WARNING  [Worker 7]: Failed load audio: 6/norine_braun-now_and_zen-08-gently-117-146.mp3. Ignored.                           preprocess.py:48
+[04/30/21 18:24:15] INFO     [Worker 9]: 50% tasks done. (time usage: 12.47 min)                                                                 preprocess.py:63
+[04/30/21 18:24:16] INFO     [Worker 10]: 50% tasks done. (time usage: 12.50 min)                                                                preprocess.py:63
+[04/30/21 18:24:19] INFO     [Worker 8]: 50% tasks done. (time usage: 12.54 min)                                                                 preprocess.py:63
+[04/30/21 18:24:19] INFO     [Worker 3]: 50% tasks done. (time usage: 12.55 min)                                                                 preprocess.py:63
+[04/30/21 18:24:21] INFO     [Worker 6]: 50% tasks done. (time usage: 12.58 min)                                                                 preprocess.py:63
+[04/30/21 18:24:21] INFO     [Worker 11]: 50% tasks done. (time usage: 12.58 min)                                                                preprocess.py:63
+[04/30/21 18:24:22] INFO     [Worker 1]: 50% tasks done. (time usage: 12.59 min)                                                                 preprocess.py:63
+[04/30/21 18:24:25] INFO     [Worker 2]: 50% tasks done. (time usage: 12.65 min)                                                                 preprocess.py:63
+[04/30/21 18:24:26] INFO     [Worker 7]: 50% tasks done. (time usage: 12.66 min)                                                                 preprocess.py:63
+[04/30/21 18:24:28] INFO     [Worker 5]: 50% tasks done. (time usage: 12.69 min)                                                                 preprocess.py:63
+[04/30/21 18:24:28] INFO     [Worker 0]: 50% tasks done. (time usage: 12.70 min)                                                                 preprocess.py:63
+[04/30/21 18:24:30] INFO     [Worker 4]: 50% tasks done. (time usage: 12.72 min)                                                                 preprocess.py:63
+[04/30/21 18:24:55] WARNING  [Worker 11]: Failed load audio:                                                                                     preprocess.py:48
+                             8/jacob_heringman-josquin_des_prez_lute_settings-19-gintzler__pater_noster-204-233.mp3. Ignored.                                    
+[04/30/21 18:26:47] INFO     [Worker 9]: 60% tasks done. (time usage: 15.00 min)                                                                 preprocess.py:63
+[04/30/21 18:26:48] INFO     [Worker 8]: 60% tasks done. (time usage: 15.03 min)                                                                 preprocess.py:63
+[04/30/21 18:26:49] INFO     [Worker 10]: 60% tasks done. (time usage: 15.04 min)                                                                preprocess.py:63
+[04/30/21 18:26:51] INFO     [Worker 11]: 60% tasks done. (time usage: 15.07 min)                                                                preprocess.py:63
+[04/30/21 18:26:52] INFO     [Worker 3]: 60% tasks done. (time usage: 15.09 min)                                                                 preprocess.py:63
+[04/30/21 18:26:54] INFO     [Worker 6]: 60% tasks done. (time usage: 15.12 min)                                                                 preprocess.py:63
+[04/30/21 18:26:54] INFO     [Worker 1]: 60% tasks done. (time usage: 15.12 min)                                                                 preprocess.py:63
+[04/30/21 18:26:57] INFO     [Worker 2]: 60% tasks done. (time usage: 15.17 min)                                                                 preprocess.py:63
+[04/30/21 18:27:01] INFO     [Worker 5]: 60% tasks done. (time usage: 15.24 min)                                                                 preprocess.py:63
+[04/30/21 18:27:02] INFO     [Worker 7]: 60% tasks done. (time usage: 15.25 min)                                                                 preprocess.py:63
+[04/30/21 18:27:02] INFO     [Worker 0]: 60% tasks done. (time usage: 15.26 min)                                                                 preprocess.py:63
+[04/30/21 18:27:03] INFO     [Worker 4]: 60% tasks done. (time usage: 15.28 min)                                                                 preprocess.py:63
+[04/30/21 18:29:14] INFO     [Worker 9]: 70% tasks done. (time usage: 17.46 min)                                                                 preprocess.py:63
+[04/30/21 18:29:17] INFO     [Worker 8]: 70% tasks done. (time usage: 17.50 min)                                                                 preprocess.py:63
+[04/30/21 18:29:19] INFO     [Worker 10]: 70% tasks done. (time usage: 17.54 min)                                                                preprocess.py:63
+[04/30/21 18:29:23] INFO     [Worker 11]: 70% tasks done. (time usage: 17.60 min)                                                                preprocess.py:63
+[04/30/21 18:29:24] INFO     [Worker 3]: 70% tasks done. (time usage: 17.62 min)                                                                 preprocess.py:63
+[04/30/21 18:29:24] INFO     [Worker 1]: 70% tasks done. (time usage: 17.63 min)                                                                 preprocess.py:63
+[04/30/21 18:29:26] INFO     [Worker 6]: 70% tasks done. (time usage: 17.66 min)                                                                 preprocess.py:63
+[04/30/21 18:29:28] INFO     [Worker 2]: 70% tasks done. (time usage: 17.69 min)                                                                 preprocess.py:63
+[04/30/21 18:29:33] INFO     [Worker 7]: 70% tasks done. (time usage: 17.78 min)                                                                 preprocess.py:63
+[04/30/21 18:29:33] INFO     [Worker 0]: 70% tasks done. (time usage: 17.78 min)                                                                 preprocess.py:63
+[04/30/21 18:29:34] INFO     [Worker 5]: 70% tasks done. (time usage: 17.80 min)                                                                 preprocess.py:63
+[04/30/21 18:29:36] INFO     [Worker 4]: 70% tasks done. (time usage: 17.82 min)                                                                 preprocess.py:63
+[04/30/21 18:31:42] INFO     [Worker 8]: 80% tasks done. (time usage: 19.93 min)                                                                 preprocess.py:63
+[04/30/21 18:31:44] INFO     [Worker 9]: 80% tasks done. (time usage: 19.95 min)                                                                 preprocess.py:63
+[04/30/21 18:31:44] INFO     [Worker 10]: 80% tasks done. (time usage: 19.95 min)                                                                preprocess.py:63
+[04/30/21 18:31:51] INFO     [Worker 3]: 80% tasks done. (time usage: 20.08 min)                                                                 preprocess.py:63
+[04/30/21 18:31:52] INFO     [Worker 11]: 80% tasks done. (time usage: 20.09 min)                                                                preprocess.py:63
+[04/30/21 18:31:53] INFO     [Worker 6]: 80% tasks done. (time usage: 20.11 min)                                                                 preprocess.py:63
+[04/30/21 18:31:53] INFO     [Worker 1]: 80% tasks done. (time usage: 20.11 min)                                                                 preprocess.py:63
+[04/30/21 18:31:56] INFO     [Worker 2]: 80% tasks done. (time usage: 20.16 min)                                                                 preprocess.py:63
+[04/30/21 18:32:01] INFO     [Worker 0]: 80% tasks done. (time usage: 20.24 min)                                                                 preprocess.py:63
+[04/30/21 18:32:04] INFO     [Worker 7]: 80% tasks done. (time usage: 20.29 min)                                                                 preprocess.py:63
+[04/30/21 18:32:04] INFO     [Worker 4]: 80% tasks done. (time usage: 20.29 min)                                                                 preprocess.py:63
+[04/30/21 18:32:06] INFO     [Worker 5]: 80% tasks done. (time usage: 20.33 min)                                                                 preprocess.py:63
+[04/30/21 18:33:09] WARNING  [Worker 11]: Failed load audio:                                                                                     preprocess.py:48
+                             9/american_baroque-dances_and_suites_of_rameau_and_couperin-25-le_petit_rien_xiveme_ordre_couperin-88-117.mp3.                      
+                             Ignored.                                                                                                                            
+[04/30/21 18:34:10] INFO     [Worker 8]: 90% tasks done. (time usage: 22.39 min)                                                                 preprocess.py:63
+[04/30/21 18:34:11] INFO     [Worker 10]: 90% tasks done. (time usage: 22.40 min)                                                                preprocess.py:63
+[04/30/21 18:34:13] INFO     [Worker 9]: 90% tasks done. (time usage: 22.44 min)                                                                 preprocess.py:63
+[04/30/21 18:34:19] INFO     [Worker 6]: 90% tasks done. (time usage: 22.54 min)                                                                 preprocess.py:63
+[04/30/21 18:34:21] INFO     [Worker 3]: 90% tasks done. (time usage: 22.57 min)                                                                 preprocess.py:63
+[04/30/21 18:34:22] INFO     [Worker 2]: 90% tasks done. (time usage: 22.59 min)                                                                 preprocess.py:63
+[04/30/21 18:34:22] INFO     [Worker 1]: 90% tasks done. (time usage: 22.60 min)                                                                 preprocess.py:63
+[04/30/21 18:34:23] INFO     [Worker 11]: 90% tasks done. (time usage: 22.60 min)                                                                preprocess.py:63
+[04/30/21 18:34:28] INFO     [Worker 0]: 90% tasks done. (time usage: 22.70 min)                                                                 preprocess.py:63
+[04/30/21 18:34:31] INFO     [Worker 4]: 90% tasks done. (time usage: 22.74 min)                                                                 preprocess.py:63
+[04/30/21 18:34:34] INFO     [Worker 5]: 90% tasks done. (time usage: 22.79 min)                                                                 preprocess.py:63
+[04/30/21 18:34:34] INFO     [Worker 7]: 90% tasks done. (time usage: 22.80 min)                                                                 preprocess.py:63
+[04/30/21 18:36:35] INFO     [Worker 10]: 100% tasks done. (time usage: 24.81 min)                                                               preprocess.py:63
+[04/30/21 18:36:38] INFO     [Worker 9]: 100% tasks done. (time usage: 24.86 min)                                                                preprocess.py:63
+[04/30/21 18:36:39] INFO     [Worker 8]: 100% tasks done. (time usage: 24.88 min)                                                                preprocess.py:63
+[04/30/21 18:36:42] INFO     [Worker 10]: Job finished. Quit. (time usage: 24.93 min)                                                            preprocess.py:61
+[04/30/21 18:36:45] INFO     [Worker 9]: Job finished. Quit. (time usage: 24.97 min)                                                             preprocess.py:61
+[04/30/21 18:36:46] INFO     [Worker 6]: 100% tasks done. (time usage: 24.99 min)                                                                preprocess.py:63
+[04/30/21 18:36:47] INFO     [Worker 8]: Job finished. Quit. (time usage: 25.00 min)                                                             preprocess.py:61
+[04/30/21 18:36:48] INFO     [Worker 3]: 100% tasks done. (time usage: 25.02 min)                                                                preprocess.py:63
+[04/30/21 18:36:49] INFO     [Worker 2]: 100% tasks done. (time usage: 25.04 min)                                                                preprocess.py:63
+[04/30/21 18:36:50] INFO     [Worker 11]: 100% tasks done. (time usage: 25.07 min)                                                               preprocess.py:63
+[04/30/21 18:36:51] INFO     [Worker 1]: 100% tasks done. (time usage: 25.07 min)                                                                preprocess.py:63
+[04/30/21 18:36:52] INFO     [Worker 6]: Job finished. Quit. (time usage: 25.08 min)                                                             preprocess.py:61
+[04/30/21 18:36:52] INFO     [Worker 11]: Job finished. Quit. (time usage: 25.09 min)                                                            preprocess.py:61
+[04/30/21 18:36:53] INFO     [Worker 3]: Job finished. Quit. (time usage: 25.11 min)                                                             preprocess.py:61
+[04/30/21 18:36:55] INFO     [Worker 2]: Job finished. Quit. (time usage: 25.14 min)                                                             preprocess.py:61
+[04/30/21 18:36:56] INFO     [Worker 0]: 100% tasks done. (time usage: 25.15 min)                                                                preprocess.py:63
+[04/30/21 18:36:56] INFO     [Worker 1]: Job finished. Quit. (time usage: 25.16 min)                                                             preprocess.py:61
+[04/30/21 18:36:57] INFO     [Worker 5]: 100% tasks done. (time usage: 25.18 min)                                                                preprocess.py:63
+[04/30/21 18:36:57] INFO     [Worker 4]: 100% tasks done. (time usage: 25.18 min)                                                                preprocess.py:63
+[04/30/21 18:36:58] INFO     [Worker 7]: 100% tasks done. (time usage: 25.19 min)                                                                preprocess.py:63
+[04/30/21 18:37:00] INFO     [Worker 0]: Job finished. Quit. (time usage: 25.23 min)                                                             preprocess.py:61
+[04/30/21 18:37:02] INFO     [Worker 5]: Job finished. Quit. (time usage: 25.25 min)                                                             preprocess.py:61
+[04/30/21 18:37:02] INFO     [Worker 4]: Job finished. Quit. (time usage: 25.26 min)                                                             preprocess.py:61
+[04/30/21 18:37:03] INFO     [Worker 7]: Job finished. Quit. (time usage: 25.27 min)                                                             preprocess.py:61
+───────────────────────────────────────────────────────────────── MTT Dataset Preparation Done ──────────────────────────────────────────────────────────────────

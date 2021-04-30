@@ -39,15 +39,21 @@ def _process_audio_files(worker_id: int,
         out_dir = p_out.joinpath(split)
 
         # process audio file
-        segments = _segment_audio(_load_audio(p_raw.joinpath(t.mp3_path), sample_rate=sample_rate),
-                                  n_samples=n_samples,
-                                  center=False)
+        try:
+            segments = _segment_audio(_load_audio(p_raw.joinpath(t.mp3_path), sample_rate=sample_rate),
+                                      n_samples=n_samples,
+                                      center=False)
+            loaded = True
+        except (RuntimeError, EOFError) as e:
+            LOG.warning(f"[Worker {worker_id}]: Failed load audio: {t.mp3_path}. Ignored.")
+            loaded = False
 
         # save label and segments to npy files
-        labels = t[t.index.tolist()[:topk]].values.astype(bool)
-        n_segments = len(segments)
-        for j, seg in enumerate(segments):
-            np.savez(out_dir.joinpath(file_pattern.format(t.clip_id, j, n_segments)).as_posix(), data=seg, labels=labels)
+        if loaded:
+            labels = t[t.index.tolist()[:topk]].values.astype(bool)
+            n_segments = len(segments)
+            for j, seg in enumerate(segments):
+                np.savez(out_dir.joinpath(file_pattern.format(t.clip_id, j, n_segments)).as_posix(), data=seg, labels=labels)
 
         # report progress
         idx += 1
