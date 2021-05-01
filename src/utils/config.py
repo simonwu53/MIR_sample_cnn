@@ -39,3 +39,7 @@ LOG = logging.getLogger('sample_cnn')
 # RANDOM SEEDS (with new practice, use RNG-Random_Number_Generator, which can be used locally)
 _seed = 53
 RNG = reset_all_seeds(_seed)
+
+# Dataset Statistics
+MTT_MEAN = -0.00016837834875982804
+MTT_STD = 0.1563320988805334

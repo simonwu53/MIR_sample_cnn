@@ -36,15 +36,48 @@ def _segment_audio(audio: np.ndarray, n_samples: int = 59049, center: bool = Fal
 
 
 def MTT_statistics(args):
+    from src.data.dataset import MTTDataset
+    from rich.progress import Progress, BarColumn, TimeRemainingColumn, TimeElapsedColumn, TextColumn
 
+    # initialize statistics
+    dataset = MTTDataset(path=args.p_data, split=args.split)
+    total_segments = len(dataset)
+    n_samples_per_segment = args.n_samples
+    sum_x, sum_x2 = 0, 0
+    n_samples_total = total_segments * n_samples_per_segment
+
+    # iterating over dataset
+    with Progress("[progress.description]{task.description}",
+                  BarColumn(),
+                  "[progress.percentage]{task.percentage:>3.0f}%",
+                  TimeRemainingColumn(),
+                  TextColumn("/"),
+                  TimeElapsedColumn(),
+                  "{task.completed} of {task.total} steps",
+                  expand=False, console=CONSOLE, refresh_per_second=5) as progress:
+        task = progress.add_task(description='[Scanning Dataset] ', total=total_segments)
+
+        for i in range(total_segments):
+            sample, label = dataset[i]
+            sum_x += np.sum(sample)
+            sum_x2 += np.sum(sample**2)
+
+            progress.update(task, advance=1)
+
+    LOG.info("Calculating final results...")
+    mean = sum_x / n_samples_total
+    std = np.sqrt((sum_x2 - sum_x**2/n_samples_total)/(n_samples_total-1))
+    LOG.info(f"Mean: {mean}\nStddev: {std}")
     return
 
 
 def data_arg_parser(p: Optional[argparse.ArgumentParser] = None) -> argparse.ArgumentParser:
     if not p:
         p = argparse.ArgumentParser('Audio Data Statistics Calculation', add_help=False)
-    p.add_argument('--p_data', default='./dataset/raw', type=str)
+    p.add_argument('--p_data', default='./dataset/processed', type=str)
+    p.add_argument('--split', default='train', choices=['train', 'val', 'test'], type=str)
     p.add_argument('--sr', default=22050, type=int)
+    p.add_argument('--n_samples', default=59049, type=int)
     return p
 
 

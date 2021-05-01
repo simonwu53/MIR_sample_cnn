@@ -1,0 +1,5 @@
+──────────────────────────────────── Dataset Statistics Calculation ─────────────────────────────────────
+[Scanning Dataset]  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:03:20 152470 of 152470 steps
+[05/01/21 13:30:24] INFO     Calculating final results...                                     audio.py:67
+                    INFO     Mean: -0.00016837834875982804                                    audio.py:70
+                             Stddev: 0.1563320988805334
