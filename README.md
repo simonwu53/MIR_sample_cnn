@@ -13,6 +13,10 @@ Waveforms*][1]"
 * Pandas (reading annotations)
 * librosa (audio processing)
 
+## Disable librosa warning messages while loading mp3 files
+* find source file `audio.py` at `site-packages/librosa/core/` of your Python interpreter.
+* comment line #162 which throws the warning `warnings.warn("PySoundFile failed. Trying audioread instead.")`.
+
 
 [1]: https://pytorch.org/
 [2]: https://github.com/willmcgugan/rich

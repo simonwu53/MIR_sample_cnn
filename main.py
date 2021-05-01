@@ -1,5 +1,5 @@
 from src.models import cnn_arg_parser
-from src.utils import VAR, LOG, CONSOLE, traceback_install
+from src.utils import LOG, CONSOLE, traceback_install, F_LOG_OUT
 import argparse
 from train import train_on_model
 
@@ -74,6 +74,8 @@ def main(args):
     else:
         raise NotImplementedError
 
+    # close log file
+    F_LOG_OUT.close()
     return
 
 

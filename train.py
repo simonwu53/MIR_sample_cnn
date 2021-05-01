@@ -1,6 +1,6 @@
 from src.models import build_model, get_loss, get_optimizer
 from src.data import DataPrefetcher, MTTDataset
-from src.utils import VAR, LOG, CONSOLE, MTT_MEAN, MTT_STD
+from src.utils import LOG, CONSOLE, MTT_MEAN, MTT_STD
 import torch
 from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import ReduceLROnPlateau
