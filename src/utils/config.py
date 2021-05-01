@@ -12,14 +12,9 @@ _base_dir = Path(__file__).parent.parent.parent.absolute()
 _log_dir = _base_dir.joinpath('logs')
 if not _log_dir.exists():
     _log_dir.mkdir()
-# TODO: setup data path later
-_data_dir = None
-_data_train_dir = None
-_data_valid_dir = None
-_data_test_dir = None
 
-_dir = namedtuple('PATH_COLLECTION', ('base', 'log', 'database', 'data_train', 'data_valid', 'data_test'))
-PATH = _dir(_base_dir, _log_dir, _data_dir, _data_train_dir, _data_valid_dir, _data_test_dir)
+_dir = namedtuple('PATH_COLLECTION', ('base', 'log'))
+PATH = _dir(_base_dir, _log_dir)
 
 # logger
 CONSOLE = Console(record=True)  # export using export_text(), title using rule(title='title')

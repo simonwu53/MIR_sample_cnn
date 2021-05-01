@@ -55,6 +55,7 @@ def main_arg_parser() -> argparse.ArgumentParser:
     p.add_argument('--checkpoint', type=str, help='Resume training from checkpoint, '
                                                   'other params will be ignored. '
                                                   'Params from last session will be restored.')
+    p.add_argument('--p_out', type=str, help='Output directory for saving')
 
     return p
 
