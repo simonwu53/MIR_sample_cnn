@@ -3,6 +3,7 @@ from pathlib import Path
 from collections import namedtuple
 import logging
 import numpy as np
+from datetime import datetime
 from rich.console import Console
 from rich.logging import RichHandler
 from rich.traceback import install
@@ -13,8 +14,8 @@ _log_dir = _base_dir.joinpath('logs')
 if not _log_dir.exists():
     _log_dir.mkdir()
 
-_dir = namedtuple('PATH_COLLECTION', ('base', 'log'))
-PATH = _dir(_base_dir, _log_dir)
+_dir = namedtuple('PATH_COLLECTION', ('base', 'log', 'datetime'))
+VAR = _dir(_base_dir, _log_dir, datetime.now().strftime('%d%m%y-%H%M'))
 
 # logger
 CONSOLE = Console(record=True)  # export using export_text(), title using rule(title='title')

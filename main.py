@@ -1,5 +1,5 @@
 from src.models import cnn_arg_parser
-from src.utils import PATH, LOG, CONSOLE, traceback_install
+from src.utils import VAR, LOG, CONSOLE, traceback_install
 import argparse
 from train import train_on_model
 
@@ -21,7 +21,7 @@ def main_arg_parser() -> argparse.ArgumentParser:
     p = cnn_arg_parser(p)  # check args listed above
     p.add_argument('--mode',
                    default='train',
-                   choices=['train', 'val', 'test'],
+                   choices=['train', 'test'],
                    type=str)
     p.add_argument('--device', default='cuda', choices=['cuda', 'cpu'],
                    type=str, help='Training device')
@@ -68,9 +68,6 @@ def main(args):
     if args.mode == 'train':
         LOG.info(f"Mode selected: {args.mode}")
         train_on_model(args)
-
-    elif args.mode == 'val':
-        raise NotImplementedError
 
     elif args.mode == 'test':
         raise NotImplementedError

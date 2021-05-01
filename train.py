@@ -1,17 +1,57 @@
 from src.models import build_model, get_loss, get_optimizer
 from src.data import DataPrefetcher, MTTDataset
-from src.utils import PATH, LOG, CONSOLE
+from src.utils import VAR, LOG, CONSOLE, MTT_MEAN, MTT_STD
+import torch
 from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import ReduceLROnPlateau
-from rich.progress import track, Progress, BarColumn, TimeRemainingColumn, TimeElapsedColumn, TextColumn
+from rich.progress import Progress, BarColumn, TimeRemainingColumn, TimeElapsedColumn, TextColumn
+
+
+def evaluate(model, loss_fn, loader, epoch, steps):
+    model.eval()
+    status_col = TextColumn("")
+    running_loss = 0
+
+    fetcher = DataPrefetcher(loader, mean=MTT_MEAN, std=MTT_STD)
+    samples, targets = fetcher.next()
+
+    with Progress("[progress.description]{task.description}",
+                  BarColumn(),
+                  "[progress.percentage]{task.percentage:>3.0f}%",
+                  TimeRemainingColumn(),
+                  TextColumn("/"),
+                  TimeElapsedColumn(),
+                  "{task.completed} of {task.total} steps",
+                  status_col,
+                  expand=False, console=CONSOLE, refresh_per_second=5) as progress:
+        task = progress.add_task(description=f'[Eval  {epoch}] ', total=steps)
+        i = 0  # counter
+
+        with torch.no_grad():
+            while samples is not None:
+
+                # forward only
+                out = model(samples)
+                val_loss = loss_fn(out, targets)
+
+                # collect running loss
+                running_loss += val_loss.item()
+                i += 1
+                # pre-fetch next samples
+                samples, targets = fetcher.next()
+
+                if not progress.finished:
+                    status_col.text_format = f"Val loss: {running_loss/i:.04f}"
+                    progress.update(task, advance=1)
+    return running_loss / i
 
 
 def train_one_epoch(model, optim, loss_fn, loader, epoch, steps):
     model.train()
     status_col = TextColumn("")
+    running_loss = 0
 
-    # TODO add mean std
-    fetcher = DataPrefetcher(loader, mean=None, std=None)
+    fetcher = DataPrefetcher(loader, mean=MTT_MEAN, std=MTT_STD)
     samples, targets = fetcher.next()
 
     with Progress("[progress.description]{task.description}",
@@ -24,11 +64,9 @@ def train_one_epoch(model, optim, loss_fn, loader, epoch, steps):
                   status_col,
                   expand=False, console=CONSOLE, refresh_per_second=5) as progress:
         task = progress.add_task(description=f'[Epoch {epoch}] ', total=steps)
+        i = 0  # counter
 
         while samples is not None:
-            if samples is None:
-                LOG.warning("No data loaded.")
-                break
             # zero the parameter gradients
             optim.zero_grad()
             # forward + backward + optimize
@@ -36,14 +74,18 @@ def train_one_epoch(model, optim, loss_fn, loader, epoch, steps):
             loss = loss_fn(out, targets)
             loss.backward()
             optim.step()
+
+            # collect running loss
+            running_loss += loss.item()
+            i += 1
             # pre-fetch next samples
             samples, targets = fetcher.next()
 
             if not progress.finished:
-                status_col.text_format = f"Loss: {loss.item():.04f}"
+                status_col.text_format = f"Loss: {running_loss/i:.04f}"
                 progress.update(task, advance=1)
 
-    return
+    return running_loss / i
 
 
 def train_epochs(model, init_epoch, args):
@@ -62,8 +104,10 @@ def train_epochs(model, init_epoch, args):
                             num_workers=args.n_workers,
                             pin_memory=True,
                             drop_last=True)
-    steps = train_dataset.calc_steps(args.batch_size)
-    LOG.info(f"Total training steps: {steps}")
+    train_steps = train_dataset.calc_steps(args.batch_size)
+    val_steps = val_dataset.calc_steps(args.batch_size)
+    LOG.info(f"Total training steps: {train_steps}")
+    LOG.info(f"Total validation steps: {val_steps}")
     LOG.info(f"Training data size: {len(train_dataset)}")
     LOG.info(f"Validation data size: {len(val_dataset)}")
 
@@ -82,9 +126,13 @@ def train_epochs(model, init_epoch, args):
     # train on epochs
     for i in range(init_epoch, args.max_epoch):
         # train
-        train_one_epoch(model, optim, loss_fn, train_loader, i+1, steps)
+        train_loss = train_one_epoch(model, optim, loss_fn, train_loader, i+1, train_steps)
+
         # validate
+        val_loss = evaluate(model, loss_fn, val_loader, i+1, val_steps)
+
         # update scheduler
+        lr_sche_plateau.step(val_loss)
     return
 
 
