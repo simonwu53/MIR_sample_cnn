@@ -1,9 +1,9 @@
 from src.models import build_model, get_loss, get_optimizer
 from src.data import DataPrefetcher, MTTDataset
-from src.utils import LOG, CONSOLE, MTT_MEAN, MTT_STD
+from src.utils import LOG, CONSOLE, MTT_MEAN, MTT_STD, EarlyStopping
 import torch
 from torch.utils.data import DataLoader
-from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch.optim.lr_scheduler import ReduceLROnPlateau, LambdaLR
 from rich.progress import Progress, BarColumn, TimeRemainingColumn, TimeElapsedColumn, TextColumn
 
 
@@ -117,11 +117,21 @@ def train_epochs(model, init_epoch, args):
     # create loss
     loss_fn = get_loss(args.loss)
 
-    # creating scheduler TODO Tensorboard CSVLogger
+    # creating scheduler TODO Tensorboard
     lr_sche_plateau = ReduceLROnPlateau(optim,
                                         factor=args.lr_decay_plateau,
                                         patience=args.plateau_patience,
                                         min_lr=args.min_lr, verbose=True)
+    lr_sche_lambda = LambdaLR(optim,
+                              lr_lambda=lambda epoch: args.lr_decay_local)
+    if args.early_stop_patience is not None:
+        assert args.early_stop_patience > 0, "Please specify the correct early stop patience value."
+        lr_sche_es = EarlyStopping(patience=args.early_stop_patience,
+                                   verbose=True,
+                                   prefix="[Scheduler]",
+                                   logger=LOG)
+    else:
+        lr_sche_es = None
 
     # train on epochs
     for i in range(init_epoch, args.max_epoch):
@@ -133,6 +143,11 @@ def train_epochs(model, init_epoch, args):
 
         # update scheduler
         lr_sche_plateau.step(val_loss)
+        lr_sche_lambda.step()
+        if lr_sche_es is not None:
+            lr_sche_es.step(val_loss)
+            if lr_sche_es.early_stop:
+                break  # early stop
     return
 
 
@@ -155,7 +170,7 @@ def train_on_model(args):
         init_epoch = 0
 
         # calculate initial lr
-        decay = args.lr_decay ** i
+        decay = args.lr_decay_global ** i
         args.lr = args.init_lr * decay
 
         # train on epochs

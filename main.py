@@ -30,12 +30,15 @@ def main_arg_parser() -> argparse.ArgumentParser:
     p.add_argument('--lr', default=1e-2, type=float, help='learning rate during training')
     p.add_argument('--init_lr', default=1e-2, type=float, help='Initial learning rate')
     p.add_argument('--min_lr', default=0.000016, type=float, help='Minimum learning rate')
-    p.add_argument('--lr_decay', default=0.2, type=float,
+    p.add_argument('--lr_decay_global', default=0.2, type=float,
                    help='Learning rate decay for each retraining')
     p.add_argument('--lr_decay_plateau', default=0.2, type=float, help='Plateau decay')
     p.add_argument('--plateau_patience', default=3, type=int, help='Plateau patience')
+    p.add_argument('--lr_decay_local', default=1e-6, type=float,
+                   help='Learning rate decay for each epoch')
     p.add_argument('--loss', default='bce', choices=['bce'], type=str,
                    help='Loss function selection')
+    p.add_argument('--early_stop_patience', type=int, help='Early stop settings for training')
     # ---SGD---
     p.add_argument('--momentum', default=0.9, type=float, help='SGD configuration')
     # ---Adam/AdamW---
@@ -74,6 +77,7 @@ def main(args):
     else:
         raise NotImplementedError
 
+    CONSOLE.rule("Task finished")
     return
 
 
