@@ -18,8 +18,7 @@ _dir = namedtuple('PATH_COLLECTION', ('base', 'log', 'datetime'))
 VAR = _dir(_base_dir, _log_dir, datetime.now().strftime('%d%m%y-%H%M'))
 
 # logger
-F_LOG_OUT = open(VAR.log.joinpath(VAR.datetime + '.log').as_posix(), mode='w')
-CONSOLE = Console(file=F_LOG_OUT)  # export using export_text(), title using rule(title='title')
+CONSOLE = Console(width=120)  # export using export_text(), title using rule(title='title')
 handler = RichHandler(level=logging.INFO,
                       console=CONSOLE,
                       show_time=True,
