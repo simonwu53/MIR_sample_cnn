@@ -31,7 +31,6 @@ def main_arg_parser() -> argparse.ArgumentParser:
     # ---Optimizer---
     p.add_argument('--optim_type', default='sgd', type=str, help='Optimizer type')
     p.add_argument('--lr', default=1e-2, type=float, help='learning rate during training')
-    p.add_argument('--init_lr', default=1e-2, type=float, help='Initial learning rate')
     p.add_argument('--min_lr', default=0.000016, type=float, help='Minimum learning rate')
     p.add_argument('--lr_decay_plateau', default=0.2, type=float, help='Plateau decay')
     p.add_argument('--plateau_patience', default=3, type=int, help='Plateau patience')

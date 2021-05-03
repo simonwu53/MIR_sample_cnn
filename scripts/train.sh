@@ -4,7 +4,7 @@ python main.py \
   --mode train \
   --p_out ./out \
   --optim_type sgd \
-  --init_lr 1e-2 \
+  --lr 1e-2 \
   --min_lr 0.000016 \
   --lr_decay_plateau 0.2 \
   --plateau_patience 3 \
