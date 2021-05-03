@@ -150,15 +150,11 @@ def train_on_model(args):
                                           factor=args.lr_decay_plateau,
                                           patience=args.plateau_patience,
                                           min_lr=args.min_lr, verbose=True)
-    if args.early_stop_patience is not None:
-        assert args.early_stop_patience > 0, "Please specify the correct early stop patience value."
-        scheduler_es = EarlyStopping(patience=args.early_stop_patience,
-                                     min_delta=args.early_stop_delta,
-                                     verbose=True,
-                                     prefix="[Scheduler]",
-                                     logger=LOG)
-    else:
-        scheduler_es = None
+    scheduler_es = EarlyStopping(patience=args.early_stop_patience,
+                                 min_delta=args.early_stop_delta,
+                                 verbose=True,
+                                 prefix="[Scheduler]",
+                                 logger=LOG)
 
     # load checkpoint OR init state_dict
     if args.checkpoint is not None:
@@ -233,10 +229,9 @@ def train_on_model(args):
 
         # update scheduler
         scheduler_plateau.step(val_loss)
-        if scheduler_es is not None:
-            scheduler_es.step(val_loss)
-            if scheduler_es.early_stop:
-                break  # early stop
+        scheduler_es.step(val_loss)
+        if scheduler_es.early_stop:
+            break  # early stop, if enabled
 
     # save last model
     LOG.info(f"Save model (val loss: {val_loss:.6f}) before exit, model saved to {p_out.as_posix()}")
@@ -245,7 +240,7 @@ def train_on_model(args):
         'optim': optim.state_dict(),
         'loss_fn': loss_fn.state_dict(),
         'scheduler_plateau': scheduler_plateau.state_dict(),
-        'scheduler_es': scheduler_es.state_dict(),
+        # 'scheduler_es': scheduler_es.state_dict(),
         'epoch': i,
         'loss': train_loss,
         'val_loss': val_loss,

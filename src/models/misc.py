@@ -130,6 +130,10 @@ class EarlyStopping:
         :param prefix: prefix text for console printing
         :param logger: logging object to print information instead of bulletin print
         """
+        if patience == 0:
+            self.enabled = False
+        else:
+            self.enabled = True
         self.patience = patience
         self.min_delta = min_delta
         self.counter = 0
@@ -141,22 +145,24 @@ class EarlyStopping:
         return
 
     def step(self, val_loss: float):
-        if self.best_loss is None:
-            self.best_loss = val_loss
-            self.counter = 0
-        elif self.best_loss - val_loss > self.min_delta:
-            self.best_loss = val_loss
-            self.counter = 0
-        elif self.best_loss - val_loss < self.min_delta:
-            self.counter += 1
-            self.print(self.prefix + f"Early stopping counter {self.counter} of {self.patience}")
-            if self.counter >= self.patience:
-                self.print(self.prefix + 'Early stopping!')
-                self.early_stop = True
+        if self.enabled:
+            if self.best_loss is None:
+                self.best_loss = val_loss
+                self.counter = 0
+            elif self.best_loss - val_loss > self.min_delta:
+                self.best_loss = val_loss
+                self.counter = 0
+            elif self.best_loss - val_loss < self.min_delta:
+                self.counter += 1
+                self.print(self.prefix + f"Early stopping counter {self.counter} of {self.patience}")
+                if self.counter >= self.patience:
+                    self.print(self.prefix + 'Early stopping!')
+                    self.early_stop = True
         return
 
     def state_dict(self) -> Dict:
         return {
+            'enabled': self.enabled,
             'patience': self.patience,
             'min_delta': self.min_delta,
             'counter': self.counter,
@@ -167,6 +173,7 @@ class EarlyStopping:
         }
 
     def load_state_dict(self, state_dict: Dict):
+        self.enabled = state_dict.get('enabled', False)
         self.patience = state_dict.get('patience', 5)
         self.min_delta = state_dict.get('min_delta', 0)
         self.counter = state_dict.get('counter', 0)
