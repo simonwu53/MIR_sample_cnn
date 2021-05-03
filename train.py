@@ -198,7 +198,7 @@ def train_on_model(args):
     # train model for epochs
     model.to(device)
     # train on epochs
-    assert init_epoch > args.max_epoch, "Initial epoch value must be bigger than max_epoch"
+    assert init_epoch < args.max_epoch, "Initial epoch value must be smaller than max_epoch in order to train model"
     for i in range(init_epoch, args.max_epoch):
 
         CONSOLE.rule(f'Start Epoch {i+1}')
