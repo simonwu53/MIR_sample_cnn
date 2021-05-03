@@ -1,9 +1,9 @@
-from src.models import build_model, get_loss, get_optimizer, find_optimal_model, load_ckpt, EarlyStopping
+from src.models import build_model, get_loss, get_optimizer, load_ckpt, EarlyStopping
 from src.data import DataPrefetcher, MTTDataset
 from src.utils import VAR, LOG, CONSOLE, MTT_MEAN, MTT_STD
 import torch
 from torch.utils.data import DataLoader
-from torch.optim.lr_scheduler import ReduceLROnPlateau, LambdaLR
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.tensorboard import SummaryWriter
 from rich.progress import Progress, BarColumn, TimeRemainingColumn, TimeElapsedColumn, TextColumn
 from pathlib import Path
@@ -15,7 +15,8 @@ def evaluate(model, loss_fn, loader, epoch, steps):
     status_col = TextColumn("")
     running_loss = 0
 
-    fetcher = DataPrefetcher(loader, mean=MTT_MEAN, std=MTT_STD)
+    # fetcher = DataPrefetcher(loader, mean=MTT_MEAN, std=MTT_STD)     # modified behavior - w/ input normalization
+    fetcher = DataPrefetcher(loader, mean=None, std=None)              # original behavior - no input normalization
     samples, targets = fetcher.next()
 
     with Progress("[progress.description]{task.description}",
@@ -55,7 +56,8 @@ def train_one_epoch(model, optim, loss_fn, loader, epoch, steps, writer, global_
     status_col = TextColumn("")
     running_loss = 0
 
-    fetcher = DataPrefetcher(loader, mean=MTT_MEAN, std=MTT_STD)
+    # fetcher = DataPrefetcher(loader, mean=MTT_MEAN, std=MTT_STD)     # modified behavior - w/ input normalization
+    fetcher = DataPrefetcher(loader, mean=None, std=None)              # original behavior - no input normalization
     samples, targets = fetcher.next()
 
     with Progress("[progress.description]{task.description}",
@@ -104,7 +106,17 @@ def train_one_epoch(model, optim, loss_fn, loader, epoch, steps, writer, global_
     return running_loss / i, global_i, (time.time() - t_start) / i
 
 
-def train_epochs(model, state_dict, stage, args):
+def train_on_model(args):
+    device = args.device
+    if device == 'cpu':
+        raise NotImplementedError("CPU training is not implemented.")
+    p_out = Path(args.p_out).joinpath(f"{args.m}^{args.n}-model-{args.tensorboard_exp_name}")
+    if not p_out.exists():
+        p_out.mkdir(exist_ok=True, parents=True)
+
+    # build model
+    model = build_model(args)
+
     # dataset & loader
     train_dataset = MTTDataset(path=args.p_data, split='train')
     val_dataset = MTTDataset(path=args.p_data, split='val')
@@ -138,8 +150,6 @@ def train_epochs(model, state_dict, stage, args):
                                           factor=args.lr_decay_plateau,
                                           patience=args.plateau_patience,
                                           min_lr=args.min_lr, verbose=True)
-    scheduler_lambda = LambdaLR(optim,
-                                lr_lambda=lambda epoch: args.lr_decay_local)
     if args.early_stop_patience is not None:
         assert args.early_stop_patience > 0, "Please specify the correct early stop patience value."
         scheduler_es = EarlyStopping(patience=args.early_stop_patience,
@@ -150,24 +160,32 @@ def train_epochs(model, state_dict, stage, args):
     else:
         scheduler_es = None
 
-    # load state_dict
-    if 'model' in state_dict:
-        model.load_state_dict(state_dict['model'])
-    if 'optim' in state_dict:
-        optim.load_state_dict(state_dict['optim'])
-    if 'loss_fn' in state_dict:
-        loss_fn.load_state_dict(state_dict['loss_fn'])
-    if state_dict.get('scheduler_plateau', None) is not None:
-        scheduler_plateau.load_state_dict(state_dict['scheduler_plateau'])
-    if state_dict.get('scheduler_lambda', None) is not None:
-        scheduler_lambda.load_state_dict(state_dict['scheduler_lambda'])
-    best_val_loss = state_dict['val_loss']
-    final_train_loss = state_dict['loss']
-    init_epoch = state_dict['epoch']
-    p_out = state_dict['p_out']
+    # load checkpoint OR init state_dict
+    if args.checkpoint is not None:
+        state_dict = load_ckpt(args.checkpoint,
+                               reset_epoch=args.ckpt_epoch,
+                               no_scheduler=args.ckpt_no_scheduler,
+                               no_optimizer=args.ckpt_no_optimizer,
+                               no_loss_fn=args.ckpt_no_loss_fn,
+                               map_values=args.ckpt_map_values)
+        if 'model' in state_dict:
+            model.load_state_dict(state_dict['model'])
+        if 'optim' in state_dict:
+            optim.load_state_dict(state_dict['optim'])
+        if 'loss_fn' in state_dict:
+            loss_fn.load_state_dict(state_dict['loss_fn'])
+        if state_dict.get('scheduler_plateau', None) is not None:
+            scheduler_plateau.load_state_dict(state_dict['scheduler_plateau'])
+        best_val_loss = state_dict['val_loss']
+        init_epoch = state_dict['epoch']
+        global_i = state_dict['global_i']
+    else:
+        # fresh training
+        best_val_loss = 9999
+        init_epoch = 0
+        global_i = 0
 
     # tensorboard
-    global_i = state_dict['global_i']
     purge_step = None if global_i == 0 else global_i
     writer = SummaryWriter(log_dir=VAR
                            .log
@@ -177,102 +195,64 @@ def train_epochs(model, state_dict, stage, args):
                            purge_step=purge_step,
                            filename_suffix='-train')
 
+    # train model for epochs
+    model.to(device)
     # train on epochs
+    assert init_epoch > args.max_epoch, "Initial epoch value must be bigger than max_epoch"
     for i in range(init_epoch, args.max_epoch):
+
+        CONSOLE.rule(f'Start Epoch {i+1}')
         # train
         train_loss, global_i, t_train = train_one_epoch(model, optim, loss_fn, train_loader,
-                                                        i+1, train_steps, writer, global_i,
+                                                        i + 1, train_steps, writer, global_i,
                                                         writer_interval=args.tensorboard_interval)
 
         # validate
-        val_loss, t_val = evaluate(model, loss_fn, val_loader, i+1, val_steps)
+        val_loss, t_val = evaluate(model, loss_fn, val_loader, i + 1, val_steps)
         writer.add_scalar('Loss/Val', val_loss, global_i)
 
-        LOG.info(f"Training time: {t_train:.4f}s per batch, Validation time {t_val:.4f}s per batch. lr {optim.param_groups[0]['lr']}")
+        LOG.info(f"Training time: {t_train:.4f}s per batch, Validation time {t_val:.4f}s per batch. lr {optim.param_groups[0]['lr']:.6f}")
 
         # save the best model
         if val_loss < best_val_loss:
             best_val_loss = val_loss
-            final_train_loss = train_loss
             LOG.info(f"New best validation loss {val_loss:.6f}, model saved to {p_out.as_posix()}")
             torch.save({
                 'model': model.state_dict(),
                 'optim': optim.state_dict(),
                 'loss_fn': loss_fn.state_dict(),
                 'scheduler_plateau': scheduler_plateau.state_dict(),
-                'scheduler_lambda': scheduler_lambda.state_dict(),
                 'scheduler_es': scheduler_es.state_dict(),
-                'stage': stage,
-                'epoch': i,
+                'epoch': i+1,
                 'loss': train_loss,
                 'val_loss': val_loss,
                 'p_out': p_out,
                 'global_i': global_i
             },
-                p_out.joinpath(f'stage-{stage:02d}-epoch-{i:03d}-loss-{val_loss:.6f}.tar').as_posix())
+                p_out.joinpath(f'epoch-{i:03d}-loss-{val_loss:.6f}.tar').as_posix())
 
         # update scheduler
         scheduler_plateau.step(val_loss)
-        scheduler_lambda.step()
         if scheduler_es is not None:
             scheduler_es.step(val_loss)
             if scheduler_es.early_stop:
                 break  # early stop
 
+    # save last model
+    LOG.info(f"Save model (val loss: {val_loss:.6f}) before exit, model saved to {p_out.as_posix()}")
+    torch.save({
+        'model': model.state_dict(),
+        'optim': optim.state_dict(),
+        'loss_fn': loss_fn.state_dict(),
+        'scheduler_plateau': scheduler_plateau.state_dict(),
+        'scheduler_es': scheduler_es.state_dict(),
+        'epoch': i,
+        'loss': train_loss,
+        'val_loss': val_loss,
+        'p_out': p_out,
+        'global_i': global_i
+    },
+        p_out.joinpath(f'epoch-{i:03d}-loss-{val_loss:.6f}.tar').as_posix())
     # close tensorboard
     writer.close()
-    return final_train_loss, best_val_loss
-
-
-def train_on_model(args):
-    device = args.device
-    if device == 'cpu':
-        raise NotImplementedError("CPU training is not implemented.")
-    p_out = Path(args.p_out).joinpath(f"{args.m}^{args.n}-model-{args.tensorboard_exp_name}")
-    if not p_out.exists():
-        p_out.mkdir(exist_ok=True, parents=True)
-
-    # build model
-    model = build_model(args)
-    model.to(device)
-
-    # load checkpoint & init state_dict
-    if args.checkpoint is not None:
-        state_dict = load_ckpt(args.checkpoint,
-                               reset_stage=args.ckpt_stage,
-                               reset_epoch=args.ckpt_epoch,
-                               no_scheduler=args.ckpt_no_scheduler,
-                               no_optimizer=args.ckpt_no_optimizer,
-                               no_loss_fn=args.ckpt_no_loss_fn,
-                               map_values=args.ckpt_map_values)
-    else:
-        state_dict = {
-            'p_out': p_out,
-            'stage': 0,
-            'val_loss': 9999,
-            'loss': 9999,
-            'epoch': 0,
-            'global_i': 0
-        }
-    current_train = state_dict['stage']
-
-    # train model for N stages
-    assert current_train < args.max_train, "Training stage is larger than max number of stages. Model is trained."
-    for i in range(current_train, args.max_train):
-        CONSOLE.rule(f"Start stage {i}")
-
-        # calculate initial lr
-        decay = args.lr_decay_global ** i
-        if args.init_lr * decay >= args.min_lr:
-            args.lr = args.init_lr * decay
-
-        # train on epochs
-        train_loss, val_loss = train_epochs(model, state_dict, i, args)
-
-        # find best model
-        LOG.info(f'Stage {i} completed')
-        if i != args.max_train - 1 and args.use_best_for_stage:
-            # load best & reset epoch and stage
-            state_dict = find_optimal_model(p_out, reset_stage=i+1, reset_epoch=0)
-            LOG.info(f"Model (best val {state_dict['val_loss']}) was selected for next stage")
     return

@@ -33,12 +33,8 @@ def main_arg_parser() -> argparse.ArgumentParser:
     p.add_argument('--lr', default=1e-2, type=float, help='learning rate during training')
     p.add_argument('--init_lr', default=1e-2, type=float, help='Initial learning rate')
     p.add_argument('--min_lr', default=0.000016, type=float, help='Minimum learning rate')
-    p.add_argument('--lr_decay_global', default=0.2, type=float,
-                   help='Learning rate decay for each retraining')
     p.add_argument('--lr_decay_plateau', default=0.2, type=float, help='Plateau decay')
     p.add_argument('--plateau_patience', default=3, type=int, help='Plateau patience')
-    p.add_argument('--lr_decay_local', default=1-1e-6, type=float,
-                   help='Learning rate decay for each epoch')
     p.add_argument('--early_stop_patience', type=int, help='Early stop settings for training')
     p.add_argument('--early_stop_delta', default=0, type=float, help='Early stop settings for training')
     # ---loss---
@@ -53,7 +49,6 @@ def main_arg_parser() -> argparse.ArgumentParser:
     # ---AdamW---
     p.add_argument('--weight_decay', default=1e-2, type=float, help='AdamW configuration')
     # ---Dataset---
-    p.add_argument('--max_train', default=5, type=int, help='Number of retraining')
     p.add_argument('--max_epoch', default=100, type=int, help='Epoch for each training')
     p.add_argument('--p_data', default='./dataset/processed', type=str,
                    help='Path to the pre-processed dataset.')
@@ -63,14 +58,12 @@ def main_arg_parser() -> argparse.ArgumentParser:
     p.add_argument('--checkpoint', type=str, help='Resume training from checkpoint, '
                                                   'other params will be ignored. '
                                                   'Params from last session will be restored')
-    p.add_argument('--ckpt_stage', type=int, help='Override checkpoint stage value')
     p.add_argument('--ckpt_epoch', type=int, help='Override checkpoint epoch value')
-    p.add_argument('--ckpt_no_scheduler', type=bool, action='store_true', help='Remove checkpoint schedulers')
-    p.add_argument('--ckpt_no_optimizer', type=bool, action='store_true', help='Remove checkpoint optimizer')
-    p.add_argument('--ckpt_no_loss_fn', type=bool, action='store_true', help='Remove checkpoint loss function')
+    p.add_argument('--ckpt_no_scheduler', action='store_true', help='Remove checkpoint schedulers')
+    p.add_argument('--ckpt_no_optimizer', action='store_true', help='Remove checkpoint optimizer')
+    p.add_argument('--ckpt_no_loss_fn', action='store_true', help='Remove checkpoint loss function')
     p.add_argument('--ckpt_map_values', type=json.loads, help="""Other values to modify in checkpoint, inputs are string dict, e.g. '{"value1":"key1"}'""")
     # ---misc---
-    p.add_argument('--use_best_for_stage', type=bool, action='store_true', help='Load the best model for the next stage')
     p.add_argument('--tensorboard_interval', default=200, type=int, help='Tensorboard writer update interval')
     p.add_argument('--tensorboard_exp_name', default='exp1', type=str, help='Tensorboard experiment name for log folder')
     return p

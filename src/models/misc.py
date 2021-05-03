@@ -59,31 +59,28 @@ def layer_print_hock(module, inputs, outputs):
 
 
 def find_optimal_model(path: Union[str, Path],
-                       reset_stage: Optional[int] = None,
                        reset_epoch: Optional[int] = None,
                        ) -> Dict:
     if isinstance(path, str):
         path = Path(path)
 
-    # f'stage-{stage:02d}-epoch-{i:03d}-loss-{val_loss:.6f}.tar'
+    # f'epoch-{i:03d}-loss-{val_loss:.6f}.tar'
     best_val = 9999
     selected = None
-    for p in path.absolute().glob('stage-*-epoch-*-loss-*.tar'):
-        _, stage, _, epoch, _, val_loss = p.as_posix().split('/')[-1][:-4].split('-')
-        stage, epoch, val_loss = int(stage), int(epoch), float(val_loss)
+    for p in path.absolute().glob('epoch-*-loss-*.tar'):
+        _, epoch, _, val_loss = p.as_posix().split('/')[-1][:-4].split('-')
+        epoch, val_loss = int(epoch), float(val_loss)
         if val_loss < best_val:
             best_val = val_loss
             selected = p
 
     state_dict = load_ckpt(selected.as_posix(),
-                           reset_stage=reset_stage,
                            reset_epoch=reset_epoch)
 
     return state_dict
 
 
 def load_ckpt(path: str,
-              reset_stage: Optional[int] = None,
               reset_epoch: Optional[int] = None,
               no_scheduler: bool = False,
               no_optimizer: bool = False,
@@ -94,8 +91,6 @@ def load_ckpt(path: str,
     excluded_keys = []
 
     # modify keys
-    if reset_stage is not None:
-        state_dict['stage'] = reset_stage
     if reset_epoch is not None:
         state_dict['epoch'] = reset_epoch
 
