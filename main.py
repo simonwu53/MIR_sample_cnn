@@ -25,6 +25,7 @@ def main_arg_parser() -> argparse.ArgumentParser:
                    type=str)
     p.add_argument('--device', default='cuda', choices=['cuda', 'cpu'],
                    type=str, help='Training device')
+    p.add_argument('--tensorboard_interval', default=200, type=int, help='Tensorboard writer update interval')
     # ---Optimizer---
     p.add_argument('--optim_type', default='sgd', type=str, help='Optimizer type')
     p.add_argument('--lr', default=1e-2, type=float, help='learning rate during training')
@@ -58,7 +59,7 @@ def main_arg_parser() -> argparse.ArgumentParser:
     p.add_argument('--checkpoint', type=str, help='Resume training from checkpoint, '
                                                   'other params will be ignored. '
                                                   'Params from last session will be restored.')
-    p.add_argument('--p_out', type=str, help='Output directory for saving')
+    p.add_argument('--p_out', default='./out', type=str, help='Output directory for saving')
 
     return p
 
