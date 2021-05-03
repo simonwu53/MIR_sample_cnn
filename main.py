@@ -1,7 +1,8 @@
 from src.models import cnn_arg_parser
 from src.utils import LOG, CONSOLE, traceback_install
-import argparse
 from train import train_on_model
+import argparse
+import json
 
 
 # substitute default traceback
@@ -10,7 +11,7 @@ traceback_install(console=CONSOLE, show_locals=True)
 
 def main_arg_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser('SAMPLE-LEVEL DEEP CONVOLUTIONAL NEURAL NETWORKS FOR MUSIC AUTO-TAGGING USING RAW WAVEFORMS', add_help=False)
-    # ---SampleCNN---
+    # ---SampleCNN args---
     # p.add_argument('--n_class', default=50, type=int)
     # p.add_argument('--m', default=3, type=int)
     # p.add_argument('--n', default=9, type=int)
@@ -25,7 +26,8 @@ def main_arg_parser() -> argparse.ArgumentParser:
                    type=str)
     p.add_argument('--device', default='cuda', choices=['cuda', 'cpu'],
                    type=str, help='Training device')
-    p.add_argument('--tensorboard_interval', default=200, type=int, help='Tensorboard writer update interval')
+    p.add_argument('--p_out', default='./out', type=str, help='Output directory for saving, '
+                                                              'will be ignored if use checkpoint')
     # ---Optimizer---
     p.add_argument('--optim_type', default='sgd', type=str, help='Optimizer type')
     p.add_argument('--lr', default=1e-2, type=float, help='learning rate during training')
@@ -35,11 +37,13 @@ def main_arg_parser() -> argparse.ArgumentParser:
                    help='Learning rate decay for each retraining')
     p.add_argument('--lr_decay_plateau', default=0.2, type=float, help='Plateau decay')
     p.add_argument('--plateau_patience', default=3, type=int, help='Plateau patience')
-    p.add_argument('--lr_decay_local', default=1e-6, type=float,
+    p.add_argument('--lr_decay_local', default=1-1e-6, type=float,
                    help='Learning rate decay for each epoch')
+    p.add_argument('--early_stop_patience', type=int, help='Early stop settings for training')
+    p.add_argument('--early_stop_delta', default=0, type=float, help='Early stop settings for training')
+    # ---loss---
     p.add_argument('--loss', default='bce', choices=['bce'], type=str,
                    help='Loss function selection')
-    p.add_argument('--early_stop_patience', type=int, help='Early stop settings for training')
     # ---SGD---
     p.add_argument('--momentum', default=0.9, type=float, help='SGD configuration')
     # ---Adam/AdamW---
@@ -55,12 +59,20 @@ def main_arg_parser() -> argparse.ArgumentParser:
                    help='Path to the pre-processed dataset.')
     p.add_argument('--batch_size', default=23, type=int, help='Batch size for training')
     p.add_argument('--n_workers', default=4, type=int, help='Number of workers for data loading')
-    # ---resume---
+    # ---resume training---
     p.add_argument('--checkpoint', type=str, help='Resume training from checkpoint, '
                                                   'other params will be ignored. '
-                                                  'Params from last session will be restored.')
-    p.add_argument('--p_out', default='./out', type=str, help='Output directory for saving')
-
+                                                  'Params from last session will be restored')
+    p.add_argument('--ckpt_stage', type=int, help='Override checkpoint stage value')
+    p.add_argument('--ckpt_epoch', type=int, help='Override checkpoint epoch value')
+    p.add_argument('--ckpt_no_scheduler', type=bool, action='store_true', help='Remove checkpoint schedulers')
+    p.add_argument('--ckpt_no_optimizer', type=bool, action='store_true', help='Remove checkpoint optimizer')
+    p.add_argument('--ckpt_no_loss_fn', type=bool, action='store_true', help='Remove checkpoint loss function')
+    p.add_argument('--ckpt_map_values', type=json.loads, help="""Other values to modify in checkpoint, inputs are string dict, e.g. '{"value1":"key1"}'""")
+    # ---misc---
+    p.add_argument('--use_best_for_stage', type=bool, action='store_true', help='Load the best model for the next stage')
+    p.add_argument('--tensorboard_interval', default=200, type=int, help='Tensorboard writer update interval')
+    p.add_argument('--tensorboard_exp_name', default='exp1', type=str, help='Tensorboard experiment name for log folder')
     return p
 
 

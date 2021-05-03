@@ -58,7 +58,10 @@ def layer_print_hock(module, inputs, outputs):
     CONSOLE.print(f'------------------------------------------')
 
 
-def find_optimal_model(path: Union[str, Path]) -> Dict:
+def find_optimal_model(path: Union[str, Path],
+                       reset_stage: Optional[int] = None,
+                       reset_epoch: Optional[int] = None,
+                       ) -> Dict:
     if isinstance(path, str):
         path = Path(path)
 
@@ -72,7 +75,45 @@ def find_optimal_model(path: Union[str, Path]) -> Dict:
             best_val = val_loss
             selected = p
 
-    return torch.load(selected.as_posix())
+    state_dict = load_ckpt(selected.as_posix(),
+                           reset_stage=reset_stage,
+                           reset_epoch=reset_epoch)
+
+    return state_dict
+
+
+def load_ckpt(path: str,
+              reset_stage: Optional[int] = None,
+              reset_epoch: Optional[int] = None,
+              no_scheduler: bool = False,
+              no_optimizer: bool = False,
+              no_loss_fn: bool = False,
+              map_values: Optional[Dict] = None) -> Dict:
+    # load state dict
+    state_dict = torch.load(path)
+    excluded_keys = []
+
+    # modify keys
+    if reset_stage is not None:
+        state_dict['stage'] = reset_stage
+    if reset_epoch is not None:
+        state_dict['epoch'] = reset_epoch
+
+    if no_scheduler:
+        excluded_keys.extend([k for k in state_dict if 'scheduler' in k])
+    if no_optimizer:
+        excluded_keys.append('optim')
+    if no_loss_fn:
+        excluded_keys.append('loss_fn')
+
+    for k in excluded_keys:
+        state_dict.pop(k, 0)
+
+    # update other keys
+    if map_values is not None:
+        state_dict.update(map_values)
+
+    return state_dict
 
 
 class EarlyStopping:
@@ -104,7 +145,7 @@ class EarlyStopping:
         self.print = logger.info if logger is not None else print
         return
 
-    def step(self, val_loss):
+    def step(self, val_loss: float):
         if self.best_loss is None:
             self.best_loss = val_loss
             self.counter = 0
@@ -119,4 +160,23 @@ class EarlyStopping:
                 self.early_stop = True
         return
 
-    # TODO add state dict
+    def state_dict(self) -> Dict:
+        return {
+            'patience': self.patience,
+            'min_delta': self.min_delta,
+            'counter': self.counter,
+            'best_loss': self.best_loss,
+            'early_stop': self.early_stop,
+            'verbose': self.verbose,
+            'prefix': self.prefix
+        }
+
+    def load_state_dict(self, state_dict: Dict):
+        self.patience = state_dict.get('patience', 5)
+        self.min_delta = state_dict.get('min_delta', 0)
+        self.counter = state_dict.get('counter', 0)
+        self.best_loss = state_dict.get('best_loss', None)
+        self.early_stop = state_dict.get('early_stop', False)
+        self.verbose = state_dict.get('verbose', False)
+        self.prefix = state_dict.get('prefix', '')
+        return
