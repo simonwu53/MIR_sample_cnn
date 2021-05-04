@@ -161,6 +161,11 @@ class Scheduler(ABC):
     def _policy(self):
         pass
 
+    def _display(self, msg):
+        if self.verbose:
+            self.print(msg)
+        return
+
     def state_dict(self) -> Dict:
         return {
             'enabled': self.enabled,
@@ -211,12 +216,10 @@ class EarlyStopping(Scheduler):
         return
 
     def _policy(self):
-        if self.verbose:
-            self.print(self.prefix + f"Early stopping counter {self.counter} of {self.patience}")
+        self._display(self.prefix + f"Early stopping counter {self.counter} of {self.patience}")
 
         if self.counter >= self.patience:
-            if self.verbose:
-                self.print(self.prefix + 'Early stopping triggered.')
+            self._display(self.prefix + 'Early stopping triggered')
             self.early_stop = True
         return
 
@@ -238,13 +241,17 @@ class ReduceLROnPlateau(Scheduler):
     def __init__(self, optimizer,
                  factor: float,
                  patience: int = 3,
+                 min_lr: float = 0,
                  min_delta: int = 0,
                  verbose: bool = False,
                  prefix: str = '',
                  logger: RootLogger = None):
         """
+        :param optimizer: optimizer for adjusting lr
+        :param factor: reduce factor, new_lr = lr * factor
         :param patience: how many epochs to wait before stopping when loss is
                not improving
+        :param min_lr: minimum lr that scheduler will not reduce lr below this value
         :param min_delta: minimum difference between new loss and old loss for
                new loss to be considered as an improvement
         :param verbose: if True, print in console when metric is not improving
@@ -258,30 +265,37 @@ class ReduceLROnPlateau(Scheduler):
                                                 logger=logger)
         self.optim = optimizer
         self.factor = factor
+        self.min_lr = min_lr
         return
 
     def _policy(self):
-        if self.verbose:
-            self.print(self.prefix + f"Plateau counter {self.counter} of {self.patience}")
+        self._display(self.prefix + f"Plateau counter {self.counter} of {self.patience}")
 
         if self.counter >= self.patience:
-            lr_group = []
             # reduce lr
-            for g in self.optim.param_groups:
+            for i, g in enumerate(self.optim.param_groups):
                 new_lr = g['lr'] * self.factor
-                g['lr'] = new_lr
-                lr_group.append(new_lr)
 
-            if self.verbose:
-                self.print(self.prefix + f'Optimizer LR reduced to {lr_group}!')
+                if new_lr >= self.min_lr:
+                    g['lr'] = new_lr
+                    self._display(self.prefix + f'Optimizer group {i}, lr reduced to {new_lr}')
+                else:
+                    self._display(self.prefix + f'Optimizer group {i}, lr reached minimum threshold')
+
+            # reset counter
+            self.counter = 0
         return
 
     def state_dict(self) -> Dict:
-        state_dict = {'factor': self.factor}
+        state_dict = {
+            'factor': self.factor,
+            'min_lr': self.min_lr
+        }
         state_dict.update(super(ReduceLROnPlateau, self).state_dict())
         return state_dict
 
     def load_state_dict(self, state_dict: Dict):
         super(ReduceLROnPlateau, self).load_state_dict(state_dict)
         self.factor = state_dict.get('factor')
+        self.min_lr = state_dict.get('min_lr')
         return

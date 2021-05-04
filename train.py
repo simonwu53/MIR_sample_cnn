@@ -169,13 +169,14 @@ def train_on_model(args):
     scheduler_plateau = ReduceLROnPlateau(optim,
                                           factor=args.lr_decay_plateau,
                                           patience=args.plateau_patience,
+                                          min_lr=args.min_lr,
                                           verbose=True,
-                                          prefix="[Scheduler]",
+                                          prefix="[Scheduler Plateau] ",
                                           logger=LOG)
     scheduler_es = EarlyStopping(patience=args.early_stop_patience,
                                  min_delta=args.early_stop_delta,
                                  verbose=True,
-                                 prefix="[Scheduler]",
+                                 prefix="[Scheduler Early Stop] ",
                                  logger=LOG)
 
     # load checkpoint OR init state_dict
@@ -263,7 +264,7 @@ def train_on_model(args):
                              model={'model': model},
                              optim={'optim': optim},
                              loss_fn={'loss_fn': loss_fn},
-                             scheduler={'scheduler_plateau': scheduler_plateau})
+                             scheduler=None)
             # reset global_i
             global_i = state_dict['global_i']
             epoch = state_dict['epoch']
