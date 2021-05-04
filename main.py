@@ -33,7 +33,7 @@ def main_arg_parser() -> argparse.ArgumentParser:
     p.add_argument('--lr', default=1e-2, type=float, help='learning rate during training')
     p.add_argument('--min_lr', default=0.000016, type=float, help='Minimum learning rate')
     p.add_argument('--lr_decay_plateau', default=0.2, type=float, help='Plateau decay')
-    p.add_argument('--plateau_patience', default=3, type=int, help='Plateau patience')
+    p.add_argument('--plateau_patience', default=2, type=int, help='Plateau patience')
     p.add_argument('--early_stop_patience', default=0, type=int, help='Early stop settings for training. default 0, disabled.')
     p.add_argument('--early_stop_delta', default=0, type=float, help='Early stop settings for training')
     # ---loss---
