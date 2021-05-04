@@ -262,13 +262,13 @@ def train_on_model(args):
             state_dict = find_optimal_model(p_out)
             apply_state_dict(state_dict,
                              model={'model': model},
-                             optim={'optim': optim},
-                             loss_fn={'loss_fn': loss_fn},
+                             optim=None,
+                             loss_fn=None,
                              scheduler=None)
             # reset global_i
             global_i = state_dict['global_i']
             epoch = state_dict['epoch']
-            LOG.info(f"Best model (val loss {state_dict['best_val_loss']}) applied. Roll back to epoch {epoch}")
+            LOG.info(f"Best model (val loss {state_dict['val_loss']}) applied. Roll back to epoch {epoch}")
             # reset tensorboard writer
             writer.close()
             writer = SummaryWriter(log_dir=VAR
