@@ -1,9 +1,8 @@
-from src.models import build_model, get_loss, get_optimizer, load_ckpt, find_optimal_model, EarlyStopping
+from src.models import build_model, get_loss, get_optimizer, load_ckpt, find_optimal_model, EarlyStopping, ReduceLROnPlateau
 from src.data import DataPrefetcher, MTTDataset
 from src.utils import VAR, LOG, CONSOLE, MTT_MEAN, MTT_STD
 import torch
 from torch.utils.data import DataLoader
-from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.tensorboard import SummaryWriter
 from rich.progress import Progress, BarColumn, TimeRemainingColumn, TimeElapsedColumn, TextColumn
 from pathlib import Path
@@ -170,7 +169,9 @@ def train_on_model(args):
     scheduler_plateau = ReduceLROnPlateau(optim,
                                           factor=args.lr_decay_plateau,
                                           patience=args.plateau_patience,
-                                          min_lr=args.min_lr, verbose=False)
+                                          verbose=True,
+                                          prefix="[Scheduler]",
+                                          logger=LOG)
     scheduler_es = EarlyStopping(patience=args.early_stop_patience,
                                  min_delta=args.early_stop_delta,
                                  verbose=True,
@@ -198,6 +199,7 @@ def train_on_model(args):
         best_val_loss = state_dict['val_loss']
         epoch = state_dict['epoch']
         global_i = state_dict['global_i']
+        LOG.info(f"Checkpoint loaded. Epoch trained {epoch}, global_i {global_i}, best val {best_val_loss:.6f}")
     else:
         # fresh training
         best_val_loss = 9999
@@ -218,7 +220,6 @@ def train_on_model(args):
     assert epoch < args.max_epoch, "Initial epoch value must be smaller than max_epoch in order to train model"
     for i in range(epoch, args.max_epoch):
 
-        CONSOLE.rule(f'Start Epoch {epoch+1}')
         # train
         init_lr = optim.param_groups[0]['lr']
         train_loss, global_i = train_one_epoch(model, optim, loss_fn, train_loader,
@@ -256,7 +257,6 @@ def train_on_model(args):
             break  # early stop, if enabled
         # if plateau lr changed
         if optim.param_groups[0]['lr'] != init_lr:
-            LOG.info(f"[Scheduler] lr changed to {optim.param_groups[0]['lr']:.6f}")
             # load last best model
             state_dict = find_optimal_model(p_out)
             apply_state_dict(state_dict,
@@ -267,6 +267,7 @@ def train_on_model(args):
             # reset global_i
             global_i = state_dict['global_i']
             epoch = state_dict['epoch']
+            LOG.info(f"Best model (val loss {state_dict['best_val_loss']}) applied. Roll back to epoch {epoch}")
             # reset tensorboard writer
             writer.close()
             writer = SummaryWriter(log_dir=VAR

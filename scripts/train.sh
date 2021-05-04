@@ -7,7 +7,7 @@ python main.py \
   --lr 1e-2 \
   --min_lr 0.000016 \
   --lr_decay_plateau 0.2 \
-  --plateau_patience 2 \
+  --plateau_patience 3 \
   --loss bce \
   --momentum 0.9 \
   --max_epoch 100 \
