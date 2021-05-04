@@ -112,6 +112,19 @@ def load_ckpt(path: str,
     return state_dict
 
 
+def apply_lr(optimizer, lr: Union[float, Iterable[float]]):
+    if isinstance(lr, (list, tuple)):
+        assert len(lr) == len(optimizer.param_groups), \
+            "lr quantity should be the same with optimizer groups, " \
+            "otherwise specify one float value instead"
+    for i, param_group in enumerate(optimizer.param_groups):
+        if isinstance(lr, float):
+            param_group['lr'] = lr
+        else:
+            param_group['lr'] = lr[i]
+    return
+
+
 class Scheduler(ABC):
     """
     Modify learning rate when the loss does not improve after certain epochs. (base class)
@@ -148,7 +161,7 @@ class Scheduler(ABC):
             if self.best_loss is None:
                 self.best_loss = val_loss
                 self.counter = 0
-            elif self.best_loss - val_loss > self.min_delta:
+            elif self.best_loss - val_loss >= self.min_delta:
                 self.best_loss = val_loss
                 self.counter = 0
             elif self.best_loss - val_loss < self.min_delta:

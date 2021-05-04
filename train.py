@@ -1,4 +1,4 @@
-from src.models import build_model, get_loss, get_optimizer, load_ckpt, find_optimal_model, EarlyStopping, ReduceLROnPlateau
+from src.models import build_model, get_loss, get_optimizer, load_ckpt, find_optimal_model, apply_lr, EarlyStopping, ReduceLROnPlateau
 from src.data import DataPrefetcher, MTTDataset
 from src.utils import VAR, LOG, CONSOLE, MTT_MEAN, MTT_STD
 import torch
@@ -258,13 +258,16 @@ def train_on_model(args):
             break  # early stop, if enabled
         # if plateau lr changed
         if optim.param_groups[0]['lr'] != init_lr:
-            # load last best model
+            # save lr before restoring
+            cur_lr = [param_group['lr'] for param_group in optim.param_groups]
+            # restore last best model
             state_dict = find_optimal_model(p_out)
             apply_state_dict(state_dict,
                              model={'model': model},
-                             optim=None,
+                             optim={'optim': optim},
                              loss_fn=None,
                              scheduler=None)
+            apply_lr(optim, cur_lr)
             # reset global_i
             global_i = state_dict['global_i']
             epoch = state_dict['epoch']
