@@ -233,6 +233,27 @@ def train_on_model(args):
 
         epoch += 1
 
+        # update scheduler
+        scheduler_plateau.step(val_loss)
+        scheduler_es.step(val_loss)
+
+        # save checkpoint
+        if optim.param_groups[0]['lr'] != init_lr:
+            LOG.info(f"Saving [red bold]checkpoint[/] at epoch {epoch}, model saved to {p_out.as_posix()}")
+            torch.save({
+                'model': model.state_dict(),
+                'optim': optim.state_dict(),
+                'loss_fn': loss_fn.state_dict(),
+                'scheduler_plateau': scheduler_plateau.state_dict(),
+                'scheduler_es': scheduler_es.state_dict(),
+                'epoch': epoch,
+                'loss': train_loss,
+                'val_loss': val_loss,
+                'p_out': p_out,
+                'global_i': global_i
+            },
+                p_out.joinpath(f'ckpt@epoch-{epoch:03d}-loss-{val_loss:.6f}.tar').as_posix())
+
         # save the best model
         if val_loss < best_val_loss:
             best_val_loss = val_loss
@@ -249,14 +270,29 @@ def train_on_model(args):
                 'p_out': p_out,
                 'global_i': global_i
             },
-                p_out.joinpath(f'epoch-{epoch:03d}-loss-{val_loss:.6f}.tar').as_posix())
+                p_out.joinpath(f'best@epoch-{epoch:03d}-loss-{val_loss:.6f}.tar').as_posix())
 
-        # update scheduler
-        scheduler_plateau.step(val_loss)
-        scheduler_es.step(val_loss)
+        # save latest model
+        else:
+            torch.save({
+                'model': model.state_dict(),
+                'optim': optim.state_dict(),
+                'loss_fn': loss_fn.state_dict(),
+                'scheduler_plateau': scheduler_plateau.state_dict(),
+                'scheduler_es': scheduler_es.state_dict(),
+                'epoch': epoch,
+                'loss': train_loss,
+                'val_loss': val_loss,
+                'p_out': p_out,
+                'global_i': global_i
+            },
+                p_out.joinpath(f'latest.tar').as_posix())
+
+        # early stop, if enabled
         if scheduler_es.early_stop:
-            break  # early stop, if enabled
-        # if plateau lr changed
+            break
+
+        # if load optimal model when lr changed
         if optim.param_groups[0]['lr'] != init_lr and args.load_optimal_on_plateau:
             # save lr before restoring
             cur_lr = [param_group['lr'] for param_group in optim.param_groups]
@@ -282,21 +318,6 @@ def train_on_model(args):
                                    purge_step=global_i,
                                    filename_suffix='-train')
 
-    # save last model
-    LOG.info(f"Save last model (val loss: {val_loss:.6f}) before exit, model saved to {p_out.as_posix()}")
-    torch.save({
-        'model': model.state_dict(),
-        'optim': optim.state_dict(),
-        'loss_fn': loss_fn.state_dict(),
-        'scheduler_plateau': scheduler_plateau.state_dict(),
-        # 'scheduler_es': scheduler_es.state_dict(),
-        'epoch': epoch,
-        'loss': train_loss,
-        'val_loss': val_loss,
-        'p_out': p_out,
-        'global_i': global_i
-    },
-        p_out.joinpath(f'epoch-{epoch:03d}-loss-{val_loss:.6f}.tar').as_posix())
     # close tensorboard
     writer.close()
     return

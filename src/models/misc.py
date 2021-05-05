@@ -68,7 +68,7 @@ def find_optimal_model(path: Union[str, Path],
     # f'epoch-{i:03d}-loss-{val_loss:.6f}.tar'
     best_val = 9999
     selected = None
-    for p in path.absolute().glob('epoch-*-loss-*.tar'):
+    for p in path.absolute().glob('*epoch-*-loss-*.tar'):
         _, epoch, _, val_loss = p.as_posix().split('/')[-1][:-4].split('-')
         epoch, val_loss = int(epoch), float(val_loss)
         if val_loss < best_val:
@@ -110,6 +110,34 @@ def load_ckpt(path: str,
         state_dict.update(map_values)
 
     return state_dict
+
+
+def show_ckpt(path: str, out: Optional[Dict] = None, printer: Optional = None) -> None:
+    # load state dict
+    state_dict = torch.load(path)
+
+    schedulers = [k for k in state_dict if 'scheduler' in k]
+
+    printer = print if printer is None else printer
+    printer(f"Model info: \n"
+            f"{[k for k in state_dict['model']]}\n")
+    printer(f"Optimizer info: \n"
+            f"{[k for k in state_dict['optim']['param_groups']]}\n")
+    printer(f"Loss Func info: \n"
+            f"{[k for k in state_dict['loss_fn']]}\n")
+    printer(f"Scheduler info: \n"
+            f"{[state_dict[k] for k in schedulers]}\n")
+
+    printer(f"Other status: \n"
+            f"epoch: {state_dict['epoch']} \n"
+            f"global i: {state_dict['global_i']} \n"
+            f"train loss: {state_dict['loss']} \n"
+            f"valid loss: {state_dict['val_loss']} \n"
+            f"path: {state_dict['p_out'].as_posix()}")
+
+    if isinstance(out, dict):
+        out.update(state_dict)
+    return
 
 
 def apply_lr(optimizer, lr: Union[float, Iterable[float]]):
