@@ -257,7 +257,7 @@ def train_on_model(args):
         if scheduler_es.early_stop:
             break  # early stop, if enabled
         # if plateau lr changed
-        if optim.param_groups[0]['lr'] != init_lr:
+        if optim.param_groups[0]['lr'] != init_lr and args.load_optimal_on_plateau:
             # save lr before restoring
             cur_lr = [param_group['lr'] for param_group in optim.param_groups]
             # restore last best model
