@@ -52,6 +52,7 @@ def main_arg_parser() -> argparse.ArgumentParser:
     p.add_argument('--max_epoch', default=100, type=int, help='Epoch for each training')
     p.add_argument('--p_data', default='./dataset/processed', type=str,
                    help='Path to the pre-processed dataset.')
+    p.add_argument('--data_normalization', action='store_true', help='Normalize batch data while training')
     p.add_argument('--batch_size', default=23, type=int, help='Batch size for training')
     p.add_argument('--n_workers', default=4, type=int, help='Number of workers for data loading')
     # ---resume training---

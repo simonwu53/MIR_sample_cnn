@@ -9,13 +9,16 @@ from pathlib import Path
 import time
 
 
-def evaluate(model, loss_fn, loader, epoch, steps):
+def evaluate(model, loss_fn, loader, epoch, steps, normalize=None):
     model.eval()
     status_col = TextColumn("")
     running_loss = 0
 
-    # fetcher = DataPrefetcher(loader, mean=MTT_MEAN, std=MTT_STD)     # modified behavior - w/ input normalization
-    fetcher = DataPrefetcher(loader, mean=None, std=None)              # original behavior - no input normalization
+    if normalize is not None:
+        assert len(normalize) == 2, "mean and std values should be provided to use data normalization"
+        fetcher = DataPrefetcher(loader, mean=normalize[0], std=normalize[1])  # modified behavior - w/ input normalization
+    else:
+        fetcher = DataPrefetcher(loader, mean=None, std=None)                  # original behavior - no input normalization
     samples, targets = fetcher.next()
 
     with Progress("[progress.description]{task.description}",
@@ -51,14 +54,17 @@ def evaluate(model, loss_fn, loader, epoch, steps):
     return running_loss / i
 
 
-def train_one_epoch(model, optim, loss_fn, loader, epoch, steps, writer, global_i, writer_interval=200):
+def train_one_epoch(model, optim, loss_fn, loader, epoch, steps, writer, global_i, writer_interval=200, normalize=None):
     model.train()
     status_col = TextColumn("")
     running_loss = 0
     lr = optim.param_groups[0]['lr']
 
-    # fetcher = DataPrefetcher(loader, mean=MTT_MEAN, std=MTT_STD)     # modified behavior - w/ input normalization
-    fetcher = DataPrefetcher(loader, mean=None, std=None)              # original behavior - no input normalization
+    if normalize is not None:
+        assert len(normalize) == 2, "mean and std values should be provided to use data normalization"
+        fetcher = DataPrefetcher(loader, mean=normalize[0], std=normalize[1])  # modified behavior - w/ input normalization
+    else:
+        fetcher = DataPrefetcher(loader, mean=None, std=None)                  # original behavior - no input normalization
     samples, targets = fetcher.next()
 
     with Progress("[progress.description]{task.description}",
@@ -154,6 +160,10 @@ def train_on_model(args):
                             drop_last=True)
     train_steps = train_dataset.calc_steps(args.batch_size)
     val_steps = val_dataset.calc_steps(args.batch_size)
+    if args.data_normalization:
+        normalize = (MTT_MEAN, MTT_STD)
+    else:
+        normalize = None
     LOG.info(f"Total training steps: {train_steps}")
     LOG.info(f"Total validation steps: {val_steps}")
     LOG.info(f"Training data size: {len(train_dataset)}")
@@ -225,10 +235,11 @@ def train_on_model(args):
         init_lr = optim.param_groups[0]['lr']
         train_loss, global_i = train_one_epoch(model, optim, loss_fn, train_loader,
                                                epoch+1, train_steps, writer, global_i,
-                                               writer_interval=args.tensorboard_interval)
+                                               writer_interval=args.tensorboard_interval,
+                                               normalize=normalize)
 
         # validate
-        val_loss = evaluate(model, loss_fn, val_loader, epoch+1, val_steps)
+        val_loss = evaluate(model, loss_fn, val_loader, epoch+1, val_steps, normalize=normalize)
         writer.add_scalar('Loss/Val', val_loss, global_i)
 
         epoch += 1
