@@ -31,7 +31,7 @@ def _process_audio_files(worker_id: int,
     t_start = time.time()
     n_parts = n_tasks // 10
     idx = 0
-    LOG.info(f"[Worker {worker_id}]: Received {n_tasks} tasks.")
+    LOG.info(f"[Worker {worker_id:02d}]: Received {n_tasks} tasks.")
 
     for i, t in tasks.iterrows():
         # find output dir
@@ -45,7 +45,7 @@ def _process_audio_files(worker_id: int,
                                       center=False)
             loaded = True
         except (RuntimeError, EOFError) as e:
-            LOG.warning(f"[Worker {worker_id}]: Failed load audio: {t.mp3_path}. Ignored.")
+            LOG.warning(f"[Worker {worker_id:02d}]: Failed load audio: {t.mp3_path}. Ignored.")
             loaded = False
 
         # save label and segments to npy files
@@ -53,14 +53,14 @@ def _process_audio_files(worker_id: int,
             labels = t[t.index.tolist()[:topk]].values.astype(bool)
             n_segments = len(segments)
             for j, seg in enumerate(segments):
-                np.savez(out_dir.joinpath(file_pattern.format(t.clip_id, j, n_segments)).as_posix(), data=seg, labels=labels)
+                np.savez_compressed(out_dir.joinpath(file_pattern.format(t.clip_id, j, n_segments)).as_posix(), data=seg, labels=labels)
 
         # report progress
         idx += 1
         if idx == n_tasks:
-            LOG.info(f"[Worker {worker_id}]: Job finished. Quit. (time usage: {(time.time() - t_start) / 60:.02f} min)")
+            LOG.info(f"[Worker {worker_id:02d}]: Job finished. Quit. (time usage: {(time.time() - t_start) / 60:.02f} min)")
         elif idx % n_parts == 0:
-            LOG.info(f"[Worker {worker_id}]: {idx//n_parts*10}% tasks done. (time usage: {(time.time() - t_start) / 60:.02f} min)")
+            LOG.info(f"[Worker {worker_id:02d}]: {idx//n_parts*10}% tasks done. (time usage: {(time.time() - t_start) / 60:.02f} min)")
     return
 
 
@@ -211,7 +211,7 @@ def prepare_MTT_dataset(args):
                                                             args.n_samples,
                                                             args.sr,
                                                             args.n_topk))
-                 if i!=args.n_worker-1
+                 if i != args.n_worker-1
                  else Process(target=_process_audio_files, args=(i,
                                                                  annotations.iloc[i*avg:],
                                                                  p_out,
