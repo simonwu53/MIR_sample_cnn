@@ -162,6 +162,7 @@ def train_on_model(args):
     val_steps = val_dataset.calc_steps(args.batch_size)
     if args.data_normalization:
         normalize = (MTT_MEAN, MTT_STD)
+        LOG.info("Data normalization [bold cyan]on[/]")
     else:
         normalize = None
     LOG.info(f"Total training steps: {train_steps}")
