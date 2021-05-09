@@ -11,6 +11,7 @@ The implementation is based on [*Sample CNN*][4] by Taejun.
 * [Testing](#testing)
 * [Results](#results)
 * [Disable librosa warning messages while loading mp3 files](#librosaissue)
+* [Future Works](#future)
 
 <a name="requirements"></a>
 ## Requirements / Dependencies
@@ -109,6 +110,11 @@ dataset
 ## Disable librosa warning messages while loading mp3 files
 * find source file `audio.py` at `site-packages/librosa/core/` of your Python interpreter.
 * comment line #162 which throws the warning `warnings.warn("PySoundFile failed. Trying audioread instead.")`.
+
+<a name="future"></a>
+## Future Works
+* Space-friendly dataset preprocessing (save the processed audio in an effective way both in terms of the 
+  space consumption and the loading speed)
 
 
 [1]: https://pytorch.org/

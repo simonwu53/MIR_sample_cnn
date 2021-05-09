@@ -23,7 +23,7 @@ def _load_audio(path: Union[str, PosixPath], sample_rate: int = 22050) -> np.nda
 
 def _segment_audio(audio: np.ndarray, n_samples: int = 59049, center: bool = False) -> List[np.ndarray]:
     total_samples = audio.shape[0]
-    n_segment = total_samples // n_samples
+    n_segment = total_samples // n_samples  # MTT has 10 segments when sample size is 59049
 
     if center:
         # take center samples

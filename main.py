@@ -39,7 +39,7 @@ def main_arg_parser() -> argparse.ArgumentParser:
     p.add_argument('--early_stop_patience', default=0, type=int, help='Early stop settings for training. default 0, disabled.')
     p.add_argument('--early_stop_delta', default=0, type=float, help='Early stop settings for training')
     # ---loss---
-    p.add_argument('--loss', default='bce', choices=['bce'], type=str,
+    p.add_argument('--loss', default='bcelogits', choices=['bce', 'bcelogits'], type=str,
                    help='Loss function selection')
     # ---SGD---
     p.add_argument('--momentum', default=0.9, type=float, help='SGD configuration')

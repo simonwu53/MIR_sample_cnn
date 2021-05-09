@@ -158,7 +158,10 @@ class SampleCNN(nn.Module):
 
         # classifier for tags
         self.classifier = nn.Linear(module_filters[-1], n_class)
-        self.sigmoid = nn.Sigmoid()
+
+        # NOTE: the activation is disabled because of using nn.BCEWithLogitsLoss loss function,
+        #       which contains sigmoid in it to take advantage of the log-sum-exp trick for numerical stability
+        self.sigmoid = nn.Sigmoid()  # used for eval mode only
 
         # name
         self.name = f'{m}^{n} Model with {samples_in} samples' if not name else name
@@ -174,7 +177,12 @@ class SampleCNN(nn.Module):
         drop = self.drop(out)
         flat = drop.flatten(1)
         logits = self.classifier(flat)
-        return self.sigmoid(logits)
+
+        # in training mode, sigmoid is included in loss function
+        if self.training:
+            return logits
+        else:
+            return self.sigmoid(logits)
 
 
 def cnn_arg_parser(p: Optional[argparse.ArgumentParser] = None) -> argparse.ArgumentParser:
