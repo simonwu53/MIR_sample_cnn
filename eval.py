@@ -61,6 +61,7 @@ def test_on_model(args):
 
     # start testing
     model.eval()
+    model.test_mode(True)
     status_col = TextColumn("")
     running_loss = 0
     if args.data_normalization:

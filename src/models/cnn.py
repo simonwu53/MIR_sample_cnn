@@ -165,6 +165,7 @@ class SampleCNN(nn.Module):
 
         # name
         self.name = f'{m}^{n} Model with {samples_in} samples' if not name else name
+        self._test = False
         LOG.info(f'SampleCNN args <n_class={n_class}, m={m}, n={n}, samples_in={samples_in}, module_filters={module_filters}, dropout={dropout}, '
                  f'kernel_size={kernel_size}, stride={stride}, padding={padding}>')
         return
@@ -178,11 +179,17 @@ class SampleCNN(nn.Module):
         flat = drop.flatten(1)
         logits = self.classifier(flat)
 
-        # in training mode, sigmoid is included in loss function
-        if self.training:
-            return logits
-        else:
+        # in test mode use model's sigmoid
+        if self._test:
             return self.sigmoid(logits)
+
+        # in training mode, sigmoid is included in loss function
+        else:
+            return logits
+
+    def test_mode(self, mode: bool = True):
+        self._test = mode
+        return
 
 
 def cnn_arg_parser(p: Optional[argparse.ArgumentParser] = None) -> argparse.ArgumentParser:
