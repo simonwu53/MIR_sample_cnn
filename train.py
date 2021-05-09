@@ -54,7 +54,8 @@ def evaluate(model, loss_fn, loader, epoch, steps, device, normalize=None):
     return running_loss / i
 
 
-def train_one_epoch(model, optim, loss_fn, loader, epoch, steps, device, writer, global_i, writer_interval=200, normalize=None):
+def train_one_epoch(model, optim, loss_fn, loader, epoch, steps, device,
+                    writer, global_i, writer_interval=200, normalize=None):
     model.train()
     status_col = TextColumn("")
     running_loss = 0
@@ -78,7 +79,6 @@ def train_one_epoch(model, optim, loss_fn, loader, epoch, steps, device, writer,
                   expand=False, console=CONSOLE, refresh_per_second=5) as progress:
         task = progress.add_task(description=f'[Epoch {epoch}]', total=steps)
         i = 0  # counter
-        has_graph = False
         t_start = time.time()
 
         while samples is not None:
@@ -98,9 +98,6 @@ def train_one_epoch(model, optim, loss_fn, loader, epoch, steps, device, writer,
             # update tensorboard
             if i % writer_interval == 0:
                 writer.add_scalar('Loss/Train', running_loss/i, global_i)
-            if not has_graph:
-                writer.add_graph(model, samples)
-                has_graph = True
 
             # pre-fetch next samples
             samples, targets = fetcher.next()
