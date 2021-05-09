@@ -116,9 +116,10 @@ def train_one_epoch(model, optim, loss_fn, loader, epoch, steps, writer, global_
 
 
 def train_on_model(args):
-    device = args.device
-    if device == 'cpu':
+    if args.device == 'cpu':
         raise NotImplementedError("CPU training is not implemented.")
+    device = torch.device(args.device)
+    torch.cuda.device(device)
     p_out = Path(args.p_out).joinpath(f"{args.m}^{args.n}-model-{args.tensorboard_exp_name}")
     if not p_out.exists():
         p_out.mkdir(exist_ok=True, parents=True)
