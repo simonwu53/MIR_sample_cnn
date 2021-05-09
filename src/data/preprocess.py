@@ -53,7 +53,7 @@ def _process_audio_files(worker_id: int,
             labels = t[t.index.tolist()[:topk]].values.astype(bool)
             n_segments = len(segments)
             for j, seg in enumerate(segments):
-                np.savez_compressed(out_dir.joinpath(file_pattern.format(t.clip_id, j, n_segments)).as_posix(), data=seg, labels=labels)
+                np.savez_compressed(out_dir.joinpath(file_pattern.format(t.clip_id, j+1, n_segments)).as_posix(), data=seg, labels=labels)
 
         # report progress
         idx += 1
