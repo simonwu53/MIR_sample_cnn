@@ -189,7 +189,7 @@ def train_on_model(args):
             if 'scheduler_plateau' in state_dict else None
         apply_state_dict(state_dict,
                          model=model_dict,
-                         optim=optim_dict,
+                         optimizer=optim_dict,
                          loss_fn=loss_fn_dict,
                          scheduler=scheduler_dict)
         best_val_loss = state_dict['val_loss']
@@ -296,7 +296,7 @@ def train_on_model(args):
             state_dict = find_optimal_model(p_out)
             apply_state_dict(state_dict,
                              model={'model': model},
-                             optim={'optim': optim},
+                             optimizer={'optim': optim},
                              loss_fn=None,
                              scheduler=None)
             apply_lr(optim, cur_lr)
