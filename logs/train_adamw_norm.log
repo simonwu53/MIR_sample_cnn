@@ -1,0 +1,177 @@
+───────────────────────────────────────────────────── Sample CNN Main Script ─────────────────────────────────────────────────────
+Namespace(batch_size=23, betas=[0.9, 0.999], checkpoint=None, ckpt_epoch=None, ckpt_map_values=None, ckpt_no_loss_fn=False,
+ckpt_no_optimizer=False, ckpt_no_scheduler=False, data_normalization=True, device='cuda', dropout=0.5, early_stop_delta=0,
+early_stop_patience=0, eps=1e-08, load_optimal_on_plateau=False, loss='bce', lr=0.01, lr_decay_plateau=0.2, m=3, max_epoch=50,
+min_lr=1.6e-05, mode='train', module_filters=[128, 128, 128, 256, 256, 256, 256, 256, 256, 512, 512], momentum=0.9, n=9,
+n_class=50, n_workers=4, name=None, optim_type='adamw', p_data='./dataset/processed', p_out='./out', plateau_patience=5,
+samples_in=59049, tensorboard_exp_name='adamw-norm', tensorboard_interval=200, weight_decay=0.01)
+[05/08/21 14:54:22] INFO     Mode selected: train                                                                       main.py:79
+                    INFO     SampleCNN args <n_class=50, m=3, n=9, samples_in=59049, module_filters=[128, 128, 128,     cnn.py:165
+                             256, 256, 256, 256, 256, 256, 512, 512], dropout=0.5, kernel_size=3, stride=3, padding=1>
+[05/08/21 14:54:24] INFO     Data normalization on                                                                    train.py:165
+                    INFO     Total training steps: 6629                                                               train.py:168
+                    INFO     Total validation steps: 664                                                              train.py:169
+                    INFO     Training data size: 152470                                                               train.py:170
+                    INFO     Validation data size: 15290                                                              train.py:171
+                    INFO     Adam Optimizer <lr=0.01, betas=[0.9, 0.999], eps=1e-08, weight_decay=0.01>                 misc.py:30
+[Epoch 1] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:50 6629 of 6629 steps Loss: 0.197935 speed: 0.0528s/it lr: 0.01
+[Eval  1] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.176779 speed: 0.0180s/it
+[05/08/21 15:00:27] INFO     New best validation loss 0.176779, model saved to out/3^9-model-adamw-norm               train.py:272
+[Epoch 2] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:59 6629 of 6629 steps Loss: 0.180481 speed: 0.0542s/it lr: 0.01
+[Eval  2] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.169924 speed: 0.0180s/it
+[05/08/21 15:06:39] INFO     New best validation loss 0.169924, model saved to out/3^9-model-adamw-norm               train.py:272
+[Epoch 3] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:50 6629 of 6629 steps Loss: 0.175367 speed: 0.0529s/it lr: 0.01
+[Eval  3] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.163666 speed: 0.0180s/it
+[05/08/21 15:12:41] INFO     New best validation loss 0.163666, model saved to out/3^9-model-adamw-norm               train.py:272
+[Epoch 4] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:51 6629 of 6629 steps Loss: 0.173295 speed: 0.0530s/it lr: 0.01
+[Eval  4] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.157114 speed: 0.0180s/it
+[05/08/21 15:18:45] INFO     New best validation loss 0.157114, model saved to out/3^9-model-adamw-norm               train.py:272
+[Epoch 5] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:48 6629 of 6629 steps Loss: 0.172141 speed: 0.0526s/it lr: 0.01
+[Eval  5] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.161096 speed: 0.0180s/it
+[05/08/21 15:24:45] INFO     [Scheduler Plateau] Plateau counter 1 of 5                                                misc.py:207
+[Epoch 6] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:48 6629 of 6629 steps Loss: 0.171485 speed: 0.0525s/it lr: 0.01
+[Eval  6] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.156942 speed: 0.0180s/it
+[05/08/21 15:30:46] INFO     New best validation loss 0.156942, model saved to out/3^9-model-adamw-norm               train.py:272
+[Epoch 7] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:48 6629 of 6629 steps Loss: 0.171240 speed: 0.0525s/it lr: 0.01
+[Eval  7] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.161936 speed: 0.0180s/it
+[05/08/21 15:36:46] INFO     [Scheduler Plateau] Plateau counter 1 of 5                                                misc.py:207
+[Epoch 8] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:48 6629 of 6629 steps Loss: 0.170805 speed: 0.0525s/it lr: 0.01
+[Eval  8] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.161019 speed: 0.0180s/it
+[05/08/21 15:42:47] INFO     [Scheduler Plateau] Plateau counter 2 of 5                                                misc.py:207
+[Epoch 9] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:47 6629 of 6629 steps Loss: 0.170800 speed: 0.0524s/it lr: 0.01
+[Eval  9] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.171505 speed: 0.0178s/it
+[05/08/21 15:48:46] INFO     [Scheduler Plateau] Plateau counter 3 of 5                                                misc.py:207
+[Epoch 10] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:45 6629 of 6629 steps Loss: 0.170591 speed: 0.0521s/it lr: 0.01
+[Eval  10] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.160725 speed: 0.0178s/it
+[05/08/21 15:54:43] INFO     [Scheduler Plateau] Plateau counter 4 of 5                                                misc.py:207
+[Epoch 11] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:45 6629 of 6629 steps Loss: 0.170739 speed: 0.0521s/it lr: 0.01
+[Eval  11] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.155910 speed: 0.0178s/it
+[05/08/21 16:00:40] INFO     New best validation loss 0.155910, model saved to out/3^9-model-adamw-norm               train.py:272
+[Epoch 12] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:45 6629 of 6629 steps Loss: 0.170650 speed: 0.0521s/it lr: 0.01
+[Eval  12] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.164563 speed: 0.0178s/it
+[05/08/21 16:06:38] INFO     [Scheduler Plateau] Plateau counter 1 of 5                                                misc.py:207
+[Epoch 13] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:45 6629 of 6629 steps Loss: 0.170709 speed: 0.0520s/it lr: 0.01
+[Eval  13] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.169033 speed: 0.0178s/it
+[05/08/21 16:12:35] INFO     [Scheduler Plateau] Plateau counter 2 of 5                                                misc.py:207
+[Epoch 14] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:44 6629 of 6629 steps Loss: 0.170647 speed: 0.0520s/it lr: 0.01
+[Eval  14] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.158720 speed: 0.0178s/it
+[05/08/21 16:18:32] INFO     [Scheduler Plateau] Plateau counter 3 of 5                                                misc.py:207
+[Epoch 15] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:44 6629 of 6629 steps Loss: 0.170524 speed: 0.0520s/it lr: 0.01
+[Eval  15] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.163288 speed: 0.0178s/it
+[05/08/21 16:24:28] INFO     [Scheduler Plateau] Plateau counter 4 of 5                                                misc.py:207
+[Epoch 16] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:45 6629 of 6629 steps Loss: 0.170555 speed: 0.0521s/it lr: 0.01
+[Eval  16] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.155988 speed: 0.0178s/it
+[05/08/21 16:30:26] INFO     [Scheduler Plateau] Plateau counter 5 of 5                                                misc.py:207
+                    INFO     [Scheduler Plateau] Optimizer group 0, lr reduced to 0.002                                misc.py:207
+                    INFO     Saving checkpoint at epoch 16, model saved to out/3^9-model-adamw-norm                   train.py:254
+[Epoch 17] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:45 6629 of 6629 steps Loss: 0.159914 speed: 0.0520s/it lr: 0.002
+[Eval  17] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.147967 speed: 0.0178s/it
+[05/08/21 16:36:23] INFO     New best validation loss 0.147967, model saved to out/3^9-model-adamw-norm               train.py:272
+[Epoch 18] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:44 6629 of 6629 steps Loss: 0.157549 speed: 0.0520s/it lr: 0.002
+[Eval  18] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.147738 speed: 0.0178s/it
+[05/08/21 16:42:20] INFO     New best validation loss 0.147738, model saved to out/3^9-model-adamw-norm               train.py:272
+[Epoch 19] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:44 6629 of 6629 steps Loss: 0.156765 speed: 0.0520s/it lr: 0.002
+[Eval  19] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.147494 speed: 0.0178s/it
+[05/08/21 16:48:17] INFO     New best validation loss 0.147494, model saved to out/3^9-model-adamw-norm               train.py:272
+[Epoch 20] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:44 6629 of 6629 steps Loss: 0.156336 speed: 0.0520s/it lr: 0.002
+[Eval  20] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.145875 speed: 0.0178s/it
+[05/08/21 16:54:14] INFO     New best validation loss 0.145875, model saved to out/3^9-model-adamw-norm               train.py:272
+[Epoch 21] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:44 6629 of 6629 steps Loss: 0.156125 speed: 0.0520s/it lr: 0.002
+[Eval  21] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.145803 speed: 0.0178s/it
+[05/08/21 17:00:10] INFO     New best validation loss 0.145803, model saved to out/3^9-model-adamw-norm               train.py:272
+[Epoch 22] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:44 6629 of 6629 steps Loss: 0.155978 speed: 0.0520s/it lr: 0.002
+[Eval  22] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.146469 speed: 0.0178s/it
+[05/08/21 17:06:07] INFO     [Scheduler Plateau] Plateau counter 1 of 5                                                misc.py:207
+[Epoch 23] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:44 6629 of 6629 steps Loss: 0.155914 speed: 0.0520s/it lr: 0.002
+[Eval  23] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.146072 speed: 0.0178s/it
+[05/08/21 17:12:04] INFO     [Scheduler Plateau] Plateau counter 2 of 5                                                misc.py:207
+[Epoch 24] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:44 6629 of 6629 steps Loss: 0.155951 speed: 0.0520s/it lr: 0.002
+[Eval  24] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.148981 speed: 0.0178s/it
+[05/08/21 17:18:01] INFO     [Scheduler Plateau] Plateau counter 3 of 5                                                misc.py:207
+[Epoch 25] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:44 6629 of 6629 steps Loss: 0.155976 speed: 0.0520s/it lr: 0.002
+[Eval  25] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.148212 speed: 0.0178s/it
+[05/08/21 17:23:58] INFO     [Scheduler Plateau] Plateau counter 4 of 5                                                misc.py:207
+[Epoch 26] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:44 6629 of 6629 steps Loss: 0.156000 speed: 0.0520s/it lr: 0.002
+[Eval  26] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.147467 speed: 0.0178s/it
+[05/08/21 17:29:55] INFO     [Scheduler Plateau] Plateau counter 5 of 5                                                misc.py:207
+                    INFO     [Scheduler Plateau] Optimizer group 0, lr reduced to 0.0004                               misc.py:207
+                    INFO     Saving checkpoint at epoch 26, model saved to out/3^9-model-adamw-norm                   train.py:254
+[Epoch 27] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:44 6629 of 6629 steps Loss: 0.150918 speed: 0.0520s/it lr: 0.0004
+[Eval  27] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.142773 speed: 0.0178s/it
+[05/08/21 17:35:51] INFO     New best validation loss 0.142773, model saved to out/3^9-model-adamw-norm               train.py:272
+[Epoch 28] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:44 6629 of 6629 steps Loss: 0.149420 speed: 0.0520s/it lr: 0.0004
+[Eval  28] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.143105 speed: 0.0178s/it
+[05/08/21 17:41:48] INFO     [Scheduler Plateau] Plateau counter 1 of 5                                                misc.py:207
+[Epoch 29] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:44 6629 of 6629 steps Loss: 0.148833 speed: 0.0520s/it lr: 0.0004
+[Eval  29] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.143316 speed: 0.0178s/it
+[05/08/21 17:47:45] INFO     [Scheduler Plateau] Plateau counter 2 of 5                                                misc.py:207
+[Epoch 30] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:46 6629 of 6629 steps Loss: 0.148371 speed: 0.0522s/it lr: 0.0004
+[Eval  30] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.143283 speed: 0.0180s/it
+[05/08/21 17:53:44] INFO     [Scheduler Plateau] Plateau counter 3 of 5                                                misc.py:207
+[Epoch 31] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:51 6629 of 6629 steps Loss: 0.147833 speed: 0.0531s/it lr: 0.0004
+[Eval  31] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:12 664 of 664 steps Val loss: 0.144611 speed: 0.0184s/it
+[05/08/21 17:59:48] INFO     [Scheduler Plateau] Plateau counter 4 of 5                                                misc.py:207
+[Epoch 32] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:48 6629 of 6629 steps Loss: 0.147536 speed: 0.0526s/it lr: 0.0004
+[Eval  32] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.144955 speed: 0.0180s/it
+[05/08/21 18:05:49] INFO     [Scheduler Plateau] Plateau counter 5 of 5                                                misc.py:207
+                    INFO     [Scheduler Plateau] Optimizer group 0, lr reduced to 8e-05                                misc.py:207
+                    INFO     Saving checkpoint at epoch 32, model saved to out/3^9-model-adamw-norm                   train.py:254
+[Epoch 33] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:48 6629 of 6629 steps Loss: 0.145857 speed: 0.0526s/it lr: 8e-05
+[Eval  33] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.144191 speed: 0.0180s/it
+[05/08/21 18:11:50] INFO     [Scheduler Plateau] Plateau counter 1 of 5                                                misc.py:207
+[Epoch 34] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:47 6629 of 6629 steps Loss: 0.145487 speed: 0.0524s/it lr: 8e-05
+[Eval  34] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.144210 speed: 0.0180s/it
+[05/08/21 18:17:49] INFO     [Scheduler Plateau] Plateau counter 2 of 5                                                misc.py:207
+[Epoch 35] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:47 6629 of 6629 steps Loss: 0.145279 speed: 0.0524s/it lr: 8e-05
+[Eval  35] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.143658 speed: 0.0180s/it
+[05/08/21 18:23:49] INFO     [Scheduler Plateau] Plateau counter 3 of 5                                                misc.py:207
+[Epoch 36] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:47 6629 of 6629 steps Loss: 0.145172 speed: 0.0524s/it lr: 8e-05
+[Eval  36] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.143406 speed: 0.0180s/it
+[05/08/21 18:29:48] INFO     [Scheduler Plateau] Plateau counter 4 of 5                                                misc.py:207
+[Epoch 37] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:47 6629 of 6629 steps Loss: 0.144993 speed: 0.0524s/it lr: 8e-05
+[Eval  37] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.143815 speed: 0.0180s/it
+[05/08/21 18:35:48] INFO     [Scheduler Plateau] Plateau counter 5 of 5                                                misc.py:207
+                    INFO     [Scheduler Plateau] Optimizer group 0, lr reduced to 1.6000000000000003e-05               misc.py:207
+                    INFO     Saving checkpoint at epoch 37, model saved to out/3^9-model-adamw-norm                   train.py:254
+[Epoch 38] ━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:47 6629 of 6629 steps Loss: 0.144583 speed: 0.0525s/it lr: 1.6000000000000003e-05
+[Eval  38] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.143278 speed: 0.0180s/it
+[05/08/21 18:41:48] INFO     [Scheduler Plateau] Plateau counter 1 of 5                                                misc.py:207
+[Epoch 39] ━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:47 6629 of 6629 steps Loss: 0.144538 speed: 0.0524s/it lr: 1.6000000000000003e-05
+[Eval  39] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.143647 speed: 0.0180s/it
+[05/08/21 18:47:48] INFO     [Scheduler Plateau] Plateau counter 2 of 5                                                misc.py:207
+[Epoch 40] ━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:47 6629 of 6629 steps Loss: 0.144459 speed: 0.0524s/it lr: 1.6000000000000003e-05
+[Eval  40] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.143395 speed: 0.0180s/it
+[05/08/21 18:53:48] INFO     [Scheduler Plateau] Plateau counter 3 of 5                                                misc.py:207
+[Epoch 41] ━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:47 6629 of 6629 steps Loss: 0.144593 speed: 0.0524s/it lr: 1.6000000000000003e-05
+[Eval  41] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.143216 speed: 0.0180s/it
+[05/08/21 18:59:48] INFO     [Scheduler Plateau] Plateau counter 4 of 5                                                misc.py:207
+[Epoch 42] ━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:47 6629 of 6629 steps Loss: 0.144493 speed: 0.0524s/it lr: 1.6000000000000003e-05
+[Eval  42] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:12 664 of 664 steps Val loss: 0.143511 speed: 0.0182s/it
+[05/08/21 19:05:47] INFO     [Scheduler Plateau] Plateau counter 5 of 5                                                misc.py:207
+                    INFO     [Scheduler Plateau] Optimizer group 0, lr reached minimum threshold                       misc.py:207
+[Epoch 43] ━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:47 6629 of 6629 steps Loss: 0.144509 speed: 0.0524s/it lr: 1.6000000000000003e-05
+[Eval  43] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.143928 speed: 0.0180s/it
+[05/08/21 19:11:47] INFO     [Scheduler Plateau] Plateau counter 1 of 5                                                misc.py:207
+[Epoch 44] ━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:47 6629 of 6629 steps Loss: 0.144470 speed: 0.0524s/it lr: 1.6000000000000003e-05
+[Eval  44] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.143310 speed: 0.0180s/it
+[05/08/21 19:17:47] INFO     [Scheduler Plateau] Plateau counter 2 of 5                                                misc.py:207
+[Epoch 45] ━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:47 6629 of 6629 steps Loss: 0.144466 speed: 0.0524s/it lr: 1.6000000000000003e-05
+[Eval  45] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:12 664 of 664 steps Val loss: 0.143386 speed: 0.0181s/it
+[05/08/21 19:23:47] INFO     [Scheduler Plateau] Plateau counter 3 of 5                                                misc.py:207
+[Epoch 46] ━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:47 6629 of 6629 steps Loss: 0.144328 speed: 0.0524s/it lr: 1.6000000000000003e-05
+[Eval  46] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.143472 speed: 0.0180s/it
+[05/08/21 19:29:46] INFO     [Scheduler Plateau] Plateau counter 4 of 5                                                misc.py:207
+[Epoch 47] ━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:47 6629 of 6629 steps Loss: 0.144412 speed: 0.0524s/it lr: 1.6000000000000003e-05
+[Eval  47] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.143488 speed: 0.0180s/it
+[05/08/21 19:35:46] INFO     [Scheduler Plateau] Plateau counter 5 of 5                                                misc.py:207
+                    INFO     [Scheduler Plateau] Optimizer group 0, lr reached minimum threshold                       misc.py:207
+[Epoch 48] ━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:47 6629 of 6629 steps Loss: 0.144211 speed: 0.0524s/it lr: 1.6000000000000003e-05
+[Eval  48] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.143401 speed: 0.0180s/it
+[05/08/21 19:41:46] INFO     [Scheduler Plateau] Plateau counter 1 of 5                                                misc.py:207
+[Epoch 49] ━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:47 6629 of 6629 steps Loss: 0.144179 speed: 0.0525s/it lr: 1.6000000000000003e-05
+[Eval  49] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.143489 speed: 0.0180s/it
+[05/08/21 19:47:46] INFO     [Scheduler Plateau] Plateau counter 2 of 5                                                misc.py:207
+[Epoch 50] ━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:05:47 6629 of 6629 steps Loss: 0.144201 speed: 0.0524s/it lr: 1.6000000000000003e-05
+[Eval  50] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:11 664 of 664 steps Val loss: 0.143799 speed: 0.0180s/it
+[05/08/21 19:53:46] INFO     [Scheduler Plateau] Plateau counter 3 of 5                                                misc.py:207
+───────────────────────────────────────────────────────── Task finished ──────────────────────────────────────────────────────────

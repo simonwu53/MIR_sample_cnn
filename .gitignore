@@ -5,3 +5,4 @@
 dataset
 logs/tensorboard/
 out/
+eval/

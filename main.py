@@ -1,6 +1,7 @@
 from src.models import cnn_arg_parser
 from src.utils import LOG, CONSOLE, traceback_install
 from train import train_on_model
+from eval import test_on_model
 import argparse
 import json
 
@@ -75,14 +76,13 @@ def main(args):
     CONSOLE.print(args)
 
     # determine mode
+    LOG.info(f"Mode selected: {args.mode}")
     if args.mode == 'train':
-        LOG.info(f"Mode selected: {args.mode}")
         train_on_model(args)
-
     elif args.mode == 'test':
-        raise NotImplementedError
+        test_on_model(args)
     else:
-        raise NotImplementedError
+        raise ValueError
 
     CONSOLE.rule("Task finished")
     return

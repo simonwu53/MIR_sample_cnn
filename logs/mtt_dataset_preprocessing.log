@@ -1,4 +1,3 @@
-(mirproj) shanwu@533s-itx:~/OneDriveUT/projects/MIR_sample_cnn$ python src/data/preprocess.py --n_worker 12
 ───────────────────────────────────────────────── Pre-processing MTT Annotations and Data for Machine Learning ──────────────────────────────────────────────────
 [04/30/21 18:11:46] INFO     Target folder (/home/shanwu/OneDriveUT/projects/MIR_sample_cnn/dataset/processed) created.                         preprocess.py:181
                     INFO     Starting pre-processing MTT annotations, keeping 50 top tags, and merging song info.                               preprocess.py:116

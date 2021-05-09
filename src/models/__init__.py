@@ -1,5 +1,5 @@
 from .cnn import cnn_arg_parser, SampleCNN
-from .misc import get_optimizer, get_loss, find_optimal_model, load_ckpt, apply_lr, show_ckpt, EarlyStopping, ReduceLROnPlateau
+from .misc import get_optimizer, get_loss, find_optimal_model, load_ckpt, apply_lr, show_ckpt, apply_state_dict, EarlyStopping, ReduceLROnPlateau, AUCMetric
 
 
 def build_model(args):

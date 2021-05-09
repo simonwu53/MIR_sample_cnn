@@ -1,7 +1,9 @@
 from src.utils import LOG, CONSOLE
+import numpy as np
 from torch import nn, optim
 import torch
 import argparse
+from sklearn.metrics import roc_auc_score
 from typing import Iterable, Optional, Union, Dict
 from logging import RootLogger
 from pathlib import Path
@@ -150,6 +152,22 @@ def apply_lr(optimizer, lr: Union[float, Iterable[float]]):
             param_group['lr'] = lr
         else:
             param_group['lr'] = lr[i]
+    return
+
+
+def apply_state_dict(state_dict, model=None, optimizer=None, loss_fn=None, scheduler=None):
+    if model is not None:
+        k, v = list(model.items())[0]
+        v.load_state_dict(state_dict[k])
+    if optimizer is not None:
+        k, v = list(optimizer.items())[0]
+        v.load_state_dict(state_dict[k])
+    if loss_fn is not None:
+        k, v = list(loss_fn.items())[0]
+        v.load_state_dict(state_dict[k])
+    if scheduler is not None:
+        k, v = list(scheduler.items())[0]
+        v.load_state_dict(state_dict[k])
     return
 
 
@@ -339,4 +357,42 @@ class ReduceLROnPlateau(Scheduler):
         super(ReduceLROnPlateau, self).load_state_dict(state_dict)
         self.factor = state_dict.get('factor')
         self.min_lr = state_dict.get('min_lr')
+        return
+
+
+class AUCMetric:
+    def __init__(self):
+        self.y_true = []
+        self.y_pred = []
+        return
+
+    def step(self, y_true: np.ndarray, y_pred: np.ndarray):
+        self.y_true.append(y_true)
+        self.y_pred.append(y_pred)
+        return
+
+    @staticmethod
+    def score(y_true: np.ndarray, y_pred: np.ndarray, average: str = 'macro') -> Union[float, Iterable[float]]:
+        return roc_auc_score(y_true, y_pred, average=average)
+
+    @property
+    def auc_score(self) -> Union[float, Iterable[float]]:
+        if len(self.y_true) == 0 or len(self.y_pred) == 0:
+            return 0
+        return self.score(np.concatenate(self.y_true), np.concatenate(self.y_pred))
+
+    def reset(self):
+        self.y_true = []
+        self.y_pred = []
+        return
+
+    def state_dict(self):
+        return {
+            'y_true': self.y_true,
+            'y_pred': self.y_pred,
+        }
+
+    def load_state_dict(self, state_dict: Dict):
+        self.y_true = state_dict.get('y_true', [])
+        self.y_pred = state_dict.get('y_pred', [])
         return

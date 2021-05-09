@@ -1,4 +1,4 @@
-from src.models import build_model, get_loss, get_optimizer, load_ckpt, find_optimal_model, apply_lr, EarlyStopping, ReduceLROnPlateau
+from src.models import build_model, get_loss, get_optimizer, load_ckpt, find_optimal_model, apply_lr, apply_state_dict, EarlyStopping, ReduceLROnPlateau
 from src.data import DataPrefetcher, MTTDataset
 from src.utils import VAR, LOG, CONSOLE, MTT_MEAN, MTT_STD
 import torch
@@ -113,22 +113,6 @@ def train_one_epoch(model, optim, loss_fn, loader, epoch, steps, writer, global_
                 progress.update(task, advance=1)
 
     return running_loss / i, global_i
-
-
-def apply_state_dict(state_dict, model=None, optim=None, loss_fn=None, scheduler=None):
-    if model is not None:
-        k, v = list(model.items())[0]
-        v.load_state_dict(state_dict[k])
-    if optim is not None:
-        k, v = list(optim.items())[0]
-        v.load_state_dict(state_dict[k])
-    if loss_fn is not None:
-        k, v = list(loss_fn.items())[0]
-        v.load_state_dict(state_dict[k])
-    if scheduler is not None:
-        k, v = list(scheduler.items())[0]
-        v.load_state_dict(state_dict[k])
-    return
 
 
 def train_on_model(args):
