@@ -25,8 +25,7 @@ def main_arg_parser() -> argparse.ArgumentParser:
                    default='train',
                    choices=['train', 'test'],
                    type=str)
-    p.add_argument('--device', default='cuda', choices=['cuda', 'cpu'],
-                   type=str, help='Training device')
+    p.add_argument('--device', default='cuda', type=str, help='Training device')
     p.add_argument('--p_out', default='./out', type=str, help='Output directory for saving, '
                                                               'will be ignored if use checkpoint')
     # ---Optimizer---
