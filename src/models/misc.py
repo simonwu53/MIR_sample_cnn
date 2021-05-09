@@ -3,11 +3,12 @@ import numpy as np
 from torch import nn, optim
 import torch
 import argparse
-from sklearn.metrics import roc_auc_score
-from typing import Iterable, Optional, Union, Dict
+from sklearn.metrics import roc_auc_score, average_precision_score
+from typing import Iterable, Optional, Union, Dict, Tuple
 from logging import RootLogger
 from pathlib import Path
 from abc import ABC, abstractmethod
+from multiprocessing import Pool
 
 
 def _get_activation(name: str) -> Optional[nn.Module]:
@@ -363,38 +364,129 @@ class ReduceLROnPlateau(Scheduler):
 
 
 class AUCMetric:
-    def __init__(self):
-        self.y_true = []
-        self.y_pred = []
+    def __init__(self, n_tags: int = 50, cache_size: int = 50000, n_workers: int = 12):
+        self.cache_size = cache_size
+        self.n_tags = n_tags
+        self.cache_y_true = np.zeros((cache_size, n_tags), np.float32)
+        self.cache_y_pred = np.zeros((cache_size, n_tags), np.float32)
+        self.idx_y_true = 0                            # index pointer for y_true cache
+        self.idx_y_pred = 0                            # index pointer for y_pred cache
+        self.running_auc_col = 0                       # running roc_auc_score for tags (columns)
+        self.running_auc_row = 0                       # running roc_auc_score for songs (rows)
+        self.running_ap_col = 0                        # running average precision for tags (columns)
+        self.running_ap_row = 0                        # running average precision for songs (rows)
+        self.counter = 0
+        self.n_workers = n_workers                     # for faster roc_auc ap calculations
         return
 
     def step(self, y_true: np.ndarray, y_pred: np.ndarray):
-        self.y_true.append(y_true)
-        self.y_pred.append(y_pred)
+        bs = y_true.shape[0]
+        # clear cache data
+        if bs + self.idx_y_true > self.cache_size:
+            self._do_calculation()
+
+        # record data only
+        self.cache_y_true[self.idx_y_true:self.idx_y_true+bs] = y_true
+        self.cache_y_pred[self.idx_y_pred:self.idx_y_pred+bs] = y_pred
+        self.idx_y_true += bs
+        self.idx_y_pred += bs
+        return
+
+    def _do_calculation(self):
+        # prepare data for calculation
+        y_true = self.cache_y_true[:self.idx_y_true]
+        y_pred = self.cache_y_pred[:self.idx_y_pred]
+        avg = self.idx_y_true // self.n_workers
+
+        # multiprocessing for auc/ap scores
+        LOG.info("waiting for calculating auc/ap scores...")
+        with Pool(processes=self.n_workers) as pool:
+            scores = pool.starmap(self._calculation_job, [(y_true[avg*i:avg*(i+1)], y_pred[avg*i:avg*(i+1)])
+                                                          if i != self.n_workers-1 else (y_true[avg*i:], y_pred[avg*i:])
+                                                          for i in range(self.n_workers)])
+            scores = np.array(scores, dtype=np.float32)
+
+        # apply results
+        auc_col, auc_row, ap_col, ap_row = scores.mean(axis=0)
+        self.running_auc_col += auc_col
+        self.running_auc_row += auc_row
+        self.running_ap_col += ap_col
+        self.running_ap_row += ap_row
+
+        # count step
+        self.counter += 1
+
+        # reset cache and idx pointer
+        self.reset_cache()
         return
 
     @staticmethod
-    def score(y_true: np.ndarray, y_pred: np.ndarray, average: str = 'macro') -> Union[float, Iterable[float]]:
-        return roc_auc_score(y_true, y_pred, average=average)
+    def _calculation_job(y_true: np.ndarray, y_pred: np.ndarray):
+        # column-wise metrics
+        m_col = ~(y_true.sum(axis=0) == 0)             # mask to exclude all zero columns in y_pred
+        y_true_col = y_true[:, m_col]
+        y_pred_col = y_pred[:, m_col]
+        auc_col = roc_auc_score(y_true_col, y_pred_col, average='macro')
+        ap_col = average_precision_score(y_true_col, y_pred_col, average='macro')
+
+        # row-wise metrics
+        m_row = ~(y_true.sum(axis=1) == 0)             # mask to exclude all zero rows in y_pred
+        y_true_row = y_true[m_row, :].transpose()      # sklearn calculate metrics for columns, need to transpose first
+        y_pred_row = y_pred[m_row, :].transpose()
+        auc_row = roc_auc_score(y_true_row, y_pred_row, average='macro')
+        ap_row = average_precision_score(y_true_row, y_pred_row, average='macro')
+        return auc_col, auc_row, ap_col, ap_row
 
     @property
-    def auc_score(self) -> Union[float, Iterable[float]]:
-        if len(self.y_true) == 0 or len(self.y_pred) == 0:
-            return 0
-        return self.score(np.concatenate(self.y_true), np.concatenate(self.y_pred))
+    def auc_ap_score(self) -> Union[Tuple[float, float, float, float]]:
+        # if no records yet
+        if self.counter == 0 and self.idx_y_true == 0:
+            return 0, 0, 0, 0
 
-    def reset(self):
-        self.y_true = []
-        self.y_pred = []
+        # calculate cache data
+        if self.idx_y_true != 0:
+            self._do_calculation()
+
+        # (AUC tag, AUC sample, AP tag, AP sample)
+        return self.running_auc_col/self.counter, \
+            self.running_auc_row/self.counter, \
+            self.running_ap_col / self.counter, \
+            self.running_ap_row / self.counter
+
+    def reset_cache(self):
+        self.cache_y_true = np.zeros((self.cache_size, self.n_tags), np.float32)
+        self.cache_y_pred = np.zeros((self.cache_size, self.n_tags), np.float32)
+        self.idx_y_true = 0
+        self.idx_y_pred = 0
         return
 
     def state_dict(self):
         return {
-            'y_true': self.y_true,
-            'y_pred': self.y_pred,
+            'auc_col': self.running_auc_col,
+            'auc_row': self.running_auc_row,
+            'ap_col': self.running_ap_col,
+            'ap_row': self.running_ap_row,
+            'counter': self.counter,
+            'n_tags': self.n_tags,
+            'cache_size': self.cache_size,
+            'cache_y_true': self.cache_y_true,
+            'cache_y_pred': self.cache_y_pred,
+            'idx_y_true': self.idx_y_true,
+            'idx_y_pred': self.idx_y_pred,
+            'n_workers': self.n_workers
         }
 
     def load_state_dict(self, state_dict: Dict):
-        self.y_true = state_dict.get('y_true', [])
-        self.y_pred = state_dict.get('y_pred', [])
+        self.running_auc_col = state_dict.get('auc_col', 0)
+        self.running_auc_row = state_dict.get('auc_row', 0)
+        self.running_ap_col = state_dict.get('ap_col', 0)
+        self.running_ap_row = state_dict.get('ap_row', 0)
+        self.counter = state_dict.get('counter', 0)
+        self.n_tags = state_dict.get('n_tags', 50)
+        self.cache_size = state_dict.get('cache_size', 5000)
+        self.cache_y_true = state_dict.get('cache_y_true')
+        self.cache_y_pred = state_dict.get('cache_y_pred')
+        self.idx_y_true = state_dict.get('idx_y_true', 0)
+        self.idx_y_pred = state_dict.get('idx_y_pred', 0)
+        self.n_workers = state_dict.get('n_workers', 0)
         return

@@ -70,12 +70,12 @@ def test_on_model(args):
     samples, targets = fetcher.next()
 
     with Progress("[progress.description]{task.description}",
+                  "[{task.completed}/{task.total}]",
                   BarColumn(),
                   "[progress.percentage]{task.percentage:>3.0f}%",
                   TimeRemainingColumn(),
                   TextColumn("/"),
                   TimeElapsedColumn(),
-                  "{task.completed} of {task.total} steps",
                   status_col,
                   expand=False, console=CONSOLE, refresh_per_second=5) as progress:
         task = progress.add_task(description=f'[Test]', total=test_steps)
@@ -91,18 +91,23 @@ def test_on_model(args):
                 # collect running loss
                 running_loss += test_loss.item()
                 i += 1
+                writer.add_scalar('Test/Loss', running_loss / i, i)
+
                 # auc metric
-                metric.step(targets.cpu().numpy().astype(np.int32), out.cpu().numpy())
-                writer.add_scalar('Loss/Test', running_loss/i, i)
+                metric.step(targets.cpu().numpy(), out.cpu().numpy())
 
                 # pre-fetch next samples
                 samples, targets = fetcher.next()
 
                 if not progress.finished:
-                    status_col.text_format = f"Test loss: {running_loss/i:.06f} " \
-                                             f"speed: {(time.time() - t_start)/i:.4f}s/it"
+                    status_col.text_format = f"Test loss: {running_loss/i:.06f}"
                     progress.update(task, advance=1)
 
-    LOG.info(f"Testing results: \nLoss: {running_loss/i:.06f} AUC: {metric.auc_score:.04f}")
+    auc_tag, auc_sample, ap_tag, ap_sample = metric.auc_ap_score
+    LOG.info(f"Testing speed: {(time.time() - t_start)/i:.4f}s/it, "
+             f"auc_tag: {auc_tag:.04f}, "
+             f"auc_sample: {auc_sample:.04f}, "
+             f"ap_tag: {ap_tag:.04f}, "
+             f"ap_sample: {ap_sample:.04f}")
     writer.close()
     return

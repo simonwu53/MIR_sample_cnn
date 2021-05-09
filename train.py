@@ -22,12 +22,12 @@ def evaluate(model, loss_fn, loader, epoch, steps, normalize=None):
     samples, targets = fetcher.next()
 
     with Progress("[progress.description]{task.description}",
+                  "[{task.completed}/{task.total}]",
                   BarColumn(),
                   "[progress.percentage]{task.percentage:>3.0f}%",
                   TimeRemainingColumn(),
                   TextColumn("/"),
                   TimeElapsedColumn(),
-                  "{task.completed} of {task.total} steps",
                   status_col,
                   expand=False, console=CONSOLE, refresh_per_second=5) as progress:
         task = progress.add_task(description=f'[Eval  {epoch}]', total=steps)
@@ -68,12 +68,12 @@ def train_one_epoch(model, optim, loss_fn, loader, epoch, steps, writer, global_
     samples, targets = fetcher.next()
 
     with Progress("[progress.description]{task.description}",
+                  "[{task.completed}/{task.total}]",
                   BarColumn(),
                   "[progress.percentage]{task.percentage:>3.0f}%",
                   TimeRemainingColumn(),
                   TextColumn("/"),
                   TimeElapsedColumn(),
-                  "{task.completed} of {task.total} steps",
                   status_col,
                   expand=False, console=CONSOLE, refresh_per_second=5) as progress:
         task = progress.add_task(description=f'[Epoch {epoch}]', total=steps)
