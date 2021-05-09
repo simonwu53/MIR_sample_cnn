@@ -9,16 +9,16 @@ from pathlib import Path
 import time
 
 
-def evaluate(model, loss_fn, loader, epoch, steps, normalize=None):
+def evaluate(model, loss_fn, loader, epoch, steps, device, normalize=None):
     model.eval()
     status_col = TextColumn("")
     running_loss = 0
 
     if normalize is not None:
         assert len(normalize) == 2, "mean and std values should be provided to use data normalization"
-        fetcher = DataPrefetcher(loader, mean=normalize[0], std=normalize[1])  # modified behavior - w/ input normalization
+        fetcher = DataPrefetcher(loader, mean=normalize[0], std=normalize[1], device=device)  # modified behavior - w/ input normalization
     else:
-        fetcher = DataPrefetcher(loader, mean=None, std=None)                  # original behavior - no input normalization
+        fetcher = DataPrefetcher(loader, mean=None, std=None, device=device)                  # original behavior - no input normalization
     samples, targets = fetcher.next()
 
     with Progress("[progress.description]{task.description}",
@@ -54,7 +54,7 @@ def evaluate(model, loss_fn, loader, epoch, steps, normalize=None):
     return running_loss / i
 
 
-def train_one_epoch(model, optim, loss_fn, loader, epoch, steps, writer, global_i, writer_interval=200, normalize=None):
+def train_one_epoch(model, optim, loss_fn, loader, epoch, steps, device, writer, global_i, writer_interval=200, normalize=None):
     model.train()
     status_col = TextColumn("")
     running_loss = 0
@@ -62,9 +62,9 @@ def train_one_epoch(model, optim, loss_fn, loader, epoch, steps, writer, global_
 
     if normalize is not None:
         assert len(normalize) == 2, "mean and std values should be provided to use data normalization"
-        fetcher = DataPrefetcher(loader, mean=normalize[0], std=normalize[1])  # modified behavior - w/ input normalization
+        fetcher = DataPrefetcher(loader, mean=normalize[0], std=normalize[1], device=device)  # modified behavior - w/ input normalization
     else:
-        fetcher = DataPrefetcher(loader, mean=None, std=None)                  # original behavior - no input normalization
+        fetcher = DataPrefetcher(loader, mean=None, std=None, device=device)                  # original behavior - no input normalization
     samples, targets = fetcher.next()
 
     with Progress("[progress.description]{task.description}",
@@ -119,7 +119,7 @@ def train_on_model(args):
     if args.device == 'cpu':
         raise NotImplementedError("CPU training is not implemented.")
     device = torch.device(args.device)
-    torch.cuda.device(device)
+    torch.cuda.set_device(device)
     p_out = Path(args.p_out).joinpath(f"{args.m}^{args.n}-model-{args.tensorboard_exp_name}")
     if not p_out.exists():
         p_out.mkdir(exist_ok=True, parents=True)
@@ -220,12 +220,12 @@ def train_on_model(args):
         # train
         init_lr = optim.param_groups[0]['lr']
         train_loss, global_i = train_one_epoch(model, optim, loss_fn, train_loader,
-                                               epoch+1, train_steps, writer, global_i,
+                                               epoch+1, train_steps, device, writer, global_i,
                                                writer_interval=args.tensorboard_interval,
                                                normalize=normalize)
 
         # validate
-        val_loss = evaluate(model, loss_fn, val_loader, epoch+1, val_steps, normalize=normalize)
+        val_loss = evaluate(model, loss_fn, val_loader, epoch+1, val_steps, device, normalize=normalize)
         writer.add_scalar('Loss/Val', val_loss, global_i)
 
         epoch += 1
