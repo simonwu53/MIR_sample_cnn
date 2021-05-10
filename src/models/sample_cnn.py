@@ -164,7 +164,7 @@ class SampleCNN(nn.Module):
         self.sigmoid = nn.Sigmoid()  # used for eval mode only
 
         # name
-        self.name = f'{m}^{n} Model with {samples_in} samples' if not name else name
+        self.name = f'{m}^{n}-Model' if not name else name
         self._test = False
         LOG.info(f'SampleCNN args <n_class={n_class}, m={m}, n={n}, samples_in={samples_in}, module_filters={module_filters}, dropout={dropout}, '
                  f'kernel_size={kernel_size}, stride={stride}, padding={padding}>')
@@ -195,13 +195,13 @@ class SampleCNN(nn.Module):
 def cnn_arg_parser(p: Optional[argparse.ArgumentParser] = None) -> argparse.ArgumentParser:
     if not p:
         p = argparse.ArgumentParser('Sample CNN Sanity Check', add_help=False)
-    p.add_argument('--n_class', default=50, type=int)
+        p.add_argument('--n_class', default=50, type=int)
+        p.add_argument('--name', type=str)
     p.add_argument('--m', default=3, type=int)
     p.add_argument('--n', default=9, type=int)
     p.add_argument('--samples_in', default=59049, type=int)
     p.add_argument('--module_filters', default=[128, 128, 128, 256, 256, 256, 256, 256, 256, 512, 512], type=int, nargs='+')
     p.add_argument('--dropout', default=0.5, type=float)
-    p.add_argument('--name', type=str)
     return p
 
 

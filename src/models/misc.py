@@ -342,6 +342,7 @@ class ReduceLROnPlateau(Scheduler):
                     g['lr'] = new_lr
                     self._display(self.prefix + f'Optimizer group {i}, lr reduced to {new_lr}')
                 else:
+                    g['lr'] = self.min_lr
                     self._display(self.prefix + f'Optimizer group {i}, lr reached minimum threshold')
 
             # reset counter

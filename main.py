@@ -1,4 +1,4 @@
-from src.models import cnn_arg_parser
+from src.models import cnn_arg_parser, expcnn_arg_parser
 from src.utils import LOG, CONSOLE, traceback_install
 from train import train_on_model
 from eval import test_on_model
@@ -13,21 +13,34 @@ traceback_install(console=CONSOLE, show_locals=True)
 def main_arg_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser('SAMPLE-LEVEL DEEP CONVOLUTIONAL NEURAL NETWORKS FOR MUSIC AUTO-TAGGING USING RAW WAVEFORMS', add_help=False)
     # ---SampleCNN args---
-    # p.add_argument('--n_class', default=50, type=int)
     # p.add_argument('--m', default=3, type=int)
     # p.add_argument('--n', default=9, type=int)
     # p.add_argument('--samples_in', default=59049, type=int)
     # p.add_argument('--module_filters', default=[128, 128, 128, 256, 256, 256, 256, 256, 256, 512, 512], type=int, nargs='+')
     # p.add_argument('--dropout', default=0.5, type=float)
-    # p.add_argument('--name', type=str)
     p = cnn_arg_parser(p)  # check args listed above
+    # p.add_argument('--layers', default=[1, 2, 4, 3, 2], type=int, nargs='+')
+    # p.add_argument('--channels', default=[64, 128, 256, 256, 512], type=int, nargs='+')
+    # p.add_argument('--in_channels', default=1, type=int)
+    # p.add_argument('--expansion', default=2, type=int)
+    # p.add_argument('--zero_init_residual', action='store_true', help='Zero-initialize the last BN in each residual branch')
+    p = expcnn_arg_parser(p)
     p.add_argument('--mode',
                    default='train',
                    choices=['train', 'test'],
                    type=str)
-    p.add_argument('--device', default='cuda', type=str, help='Training device')
+    p.add_argument('--device', default='cuda:0', type=str, help='Training device')
     p.add_argument('--p_out', default='./out', type=str, help='Output directory for saving, '
                                                               'will be ignored if use checkpoint')
+
+    # ---Model---
+    p.add_argument('--model',
+                   default='samplecnn',
+                   choices=['samplecnn', 'expcnn'],
+                   type=str)
+    p.add_argument('--n_class', default=50, type=int)
+    p.add_argument('--name', type=str)
+
     # ---Optimizer---
     p.add_argument('--optim_type', default='sgd', type=str, help='Optimizer type')
     p.add_argument('--lr', default=1e-2, type=float, help='learning rate during training')

@@ -117,13 +117,15 @@ def train_on_model(args):
         raise NotImplementedError("CPU training is not implemented.")
     device = torch.device(args.device)
     torch.cuda.set_device(device)
-    p_out = Path(args.p_out).joinpath(f"{args.m}^{args.n}-model-{args.tensorboard_exp_name}")
-    if not p_out.exists():
-        p_out.mkdir(exist_ok=True, parents=True)
 
     # build model
     model = build_model(args)
     model.to(device)
+
+    # output dir
+    p_out = Path(args.p_out).joinpath(f"{model.name}-{args.tensorboard_exp_name}")
+    if not p_out.exists():
+        p_out.mkdir(exist_ok=True, parents=True)
 
     # dataset & loader
     train_dataset = MTTDataset(path=args.p_data, split='train')
