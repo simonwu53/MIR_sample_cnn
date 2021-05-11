@@ -40,8 +40,6 @@ def get_optimizer(params: Iterable,
 def get_loss(name: str) -> nn.Module:
     name = name.lower()
     if name == 'bce':
-        return nn.BCELoss()
-    elif name == 'bcelogits':
         return nn.BCEWithLogitsLoss()
     else:
         raise NotImplementedError

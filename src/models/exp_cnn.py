@@ -188,6 +188,8 @@ def expcnn_arg_parser(p: Optional[argparse.ArgumentParser] = None) -> argparse.A
 if __name__ == '__main__':
     parser = argparse.ArgumentParser('Sample CNN Sanity Check Script', parents=[expcnn_arg_parser()])
     args = parser.parse_args()
+    args.layers = [1, 1, 1, 1, 1, 1, 1, 1]
+    args.channels = [64, 128, 128, 256, 256, 256, 512, 512]
 
     exp = ExpSampleCNN(block=Bottleneck,
                        layers=args.layers,
