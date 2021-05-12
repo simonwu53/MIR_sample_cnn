@@ -207,7 +207,7 @@ def train_on_model(args):
     writer = SummaryWriter(log_dir=VAR
                            .log
                            .joinpath('tensorboard')
-                           .joinpath(f"{args.m}^{args.n}-model-{args.tensorboard_exp_name}")
+                           .joinpath(f"{model.name}-{args.tensorboard_exp_name}")
                            .as_posix(),
                            purge_step=purge_step,
                            filename_suffix='-train')
@@ -309,7 +309,7 @@ def train_on_model(args):
             writer = SummaryWriter(log_dir=VAR
                                    .log
                                    .joinpath('tensorboard')
-                                   .joinpath(f"{args.m}^{args.n}-model-{args.tensorboard_exp_name}")
+                                   .joinpath(f"{model.name}-{args.tensorboard_exp_name}")
                                    .as_posix(),
                                    purge_step=global_i,
                                    filename_suffix='-train')
