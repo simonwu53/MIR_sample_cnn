@@ -1,7 +1,7 @@
 from src.models import cnn_arg_parser, expcnn_arg_parser
 from src.utils import LOG, CONSOLE, traceback_install
 from train import train_on_model
-from eval import test_on_model
+from eval import test_on_model, eval_on_model
 import argparse
 import json
 
@@ -27,7 +27,7 @@ def main_arg_parser() -> argparse.ArgumentParser:
     p = expcnn_arg_parser(p)
     p.add_argument('--mode',
                    default='train',
-                   choices=['train', 'test'],
+                   choices=['train', 'test', 'eval'],
                    type=str)
     p.add_argument('--device', default='cuda:0', type=str, help='Training device')
     p.add_argument('--p_out', default='./out', type=str, help='Output directory for saving, '
@@ -68,6 +68,10 @@ def main_arg_parser() -> argparse.ArgumentParser:
     p.add_argument('--data_normalization', action='store_true', help='Normalize batch data while training')
     p.add_argument('--batch_size', default=23, type=int, help='Batch size for training')
     p.add_argument('--n_workers', default=4, type=int, help='Number of workers for data loading')
+    p.add_argument('--audio_file', type=str, help='Path to the audio file for tagging. Used in eval mode only')
+    p.add_argument('--annotation_file', type=str, default='./dataset/annotations_top50.csv',
+                   help='Path to the annotation file for tagging. Created by data preprocessing process. Used in eval mode only')
+    p.add_argument('--eval_threshold', default=0.3, type=float, help='Threshold used for a positive tag in eval mode')
     # ---resume training---
     p.add_argument('--checkpoint', type=str, help='Resume training from checkpoint, '
                                                   'other params will be ignored. '
@@ -93,6 +97,8 @@ def main(args):
         train_on_model(args)
     elif args.mode == 'test':
         test_on_model(args)
+    elif args.mode == 'eval':
+        eval_on_model(args)
     else:
         raise ValueError
 
