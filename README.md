@@ -101,10 +101,25 @@ dataset
 ## Testing
 * Modify the arguments in `scripts/test.sh` (check args in ***main.py***)
 * Run `bash scripts/test.sh`
+* The results show the AUC metric for tags (column-wise), AUC metric for samples (row-wise), 
+  and averaged precision for tags and samples as well. 
+
+## Evalutation with songs
+* Modify the arguments in `scripts/eval.sh` (check args in ***main.py***. 
+  you need to provide a pre-trained model, a testing song in MTT dataset, 
+  and a threshold for activating a tag as positive)
+* Run `bash scripts/eval.sh`
+* The results show the ground truth labels and the predicted labels with frequency
 
 <a name="results"></a>
 ## Results
-* [todo]
+| Model | Configurations | Validation Loss | AUC (tags) | AUC (samples) |
+| --- | --- | --- | --- | --- |
+| 3^9 | Original setup | 0.14668 | 0.7191 |  0.7835 |
+| 3^9 | AdamW optimizer | 0.143123 | 0.7422 | 0.7833 |
+| 3^9 | AdamW + Data normalization | **0.142773** | **0.8761** | **0.9138** |
+| 3^8 | AdamW + Data normalization | 0.145101 | 0.8720 | 0.9111 |
+| 3^7 | AdamW + Data normalization | 0.147516 | 0.8671 | 0.9057 |
 
 <a name="librosaissue"></a>
 ## Disable librosa warning messages while loading mp3 files
@@ -113,8 +128,9 @@ dataset
 
 <a name="future"></a>
 ## Future Works
-* Space-friendly dataset preprocessing (save the processed audio in an effective way both in terms of the 
+* Optimized dataset preprocessing (save the processed audio in an effective way both in terms of the 
   space consumption and the loading speed)
+* Other possible auto-tagging models for raw waveforms
 
 
 [1]: https://pytorch.org/
