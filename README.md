@@ -9,6 +9,7 @@ The implementation is based on [*Sample CNN*][4] by Taejun.
 * [Dataset / Preprocessing](#preprocessing)
 * [Training](#training)
 * [Testing](#testing)
+* [Evaluation with songs](#evaluation)
 * [Results](#results)
 * [Disable librosa warning messages while loading mp3 files](#librosaissue)
 * [Future Works](#future)
@@ -104,7 +105,8 @@ dataset
 * The results show the AUC metric for tags (column-wise), AUC metric for samples (row-wise), 
   and averaged precision for tags and samples as well. 
 
-## Evalutation with songs
+<a name="evaluation"></a>
+## Evaluation with songs
 * Modify the arguments in `scripts/eval.sh` (check args in ***main.py***. 
   you need to provide a pre-trained model, a testing song in MTT dataset, 
   and a threshold for activating a tag as positive)
