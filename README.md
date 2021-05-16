@@ -2,7 +2,7 @@
 Sample CNN in PyTorch implementation. Original paper: "[*Sample-level Deep
 Convolutional Neural Networks for Music Auto-tagging Using Raw
 Waveforms*][1]"  
-The implementation is based on [*Sample CNN*][4] by Taejun.
+The implementation inspired by the original [*Sample CNN*][4] by Taejun.
 
 ## Table of Contents
 * [Requirements / Dependencies](#requirements)
