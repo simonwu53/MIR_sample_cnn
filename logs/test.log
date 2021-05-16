@@ -1,0 +1,117 @@
+# Original Model
+───────────────────────────────────────────────────── Sample CNN Main Script ─────────────────────────────────────────────────────
+Namespace(annotation_file='./dataset/annotations_top50.csv', audio_file=None, batch_size=23, betas=[0.9, 0.999], channels=[64,
+128, 128, 256, 256, 512], checkpoint='out/3^9-model-orig/epoch-012-loss-0.146685.tar', ckpt_epoch=None, ckpt_map_values=None,
+ckpt_no_loss_fn=False, ckpt_no_optimizer=False, ckpt_no_scheduler=False, data_normalization=True, device='cuda:0', dropout=0.5,
+early_stop_delta=0, early_stop_patience=0, eps=1e-08, eval_threshold=0.3, expansion=2, in_channels=1, layers=[1, 2, 2, 6, 3, 2],
+load_optimal_on_plateau=False, loss='bce', lr=0.01, lr_decay_plateau=0.2, m=3, max_epoch=100, min_lr=1.6e-05, mode='test',
+model='samplecnn', module_filters=[128, 128, 128, 256, 256, 256, 256, 256, 256, 512, 512], momentum=0.9, n=9, n_class=50,
+n_workers=4, name=None, optim_type='sgd', p_data='./dataset/processed', p_out='./eval', plateau_patience=3, samples_in=59049,
+tensorboard_exp_name='orig', tensorboard_interval=200, weight_decay=0.01, zero_init_residual=False)
+[05/15/21 23:54:00] INFO     Mode selected: test                                                                        main.py:95
+                    INFO     SampleCNN args <n_class=50, m=3, n=9, samples_in=59049, module_filters=[128, 128,   sample_cnn.py:168
+                             128, 256, 256, 256, 256, 256, 256, 512, 512], dropout=0.5, kernel_size=3, stride=3,
+                             padding=1>
+[05/15/21 23:54:02] INFO     Total testing steps: 1884                                                                  eval.py:40
+                    INFO     Testing data size: 43320                                                                   eval.py:41
+                    INFO     Checkpoint loaded. Epoch trained 12, global_i 79548, best val 0.146685                     eval.py:61
+[Test] [1884/1884] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:34 Test loss: 0.276353
+[05/15/21 23:54:37] INFO     waiting for calculating auc/ap scores...                                                  misc.py:401
+[05/15/21 23:54:49] INFO     Testing speed: 0.0249s/it, auc_tag: 0.7191, auc_sample: 0.7835, ap_tag: 0.2202,           eval.py:115
+                             ap_sample: 0.4270
+───────────────────────────────────────────────────────── Task finished ──────────────────────────────────────────────────────────
+
+# AdamW optimizer
+───────────────────────────────────────────────────── Sample CNN Main Script ─────────────────────────────────────────────────────
+Namespace(annotation_file='./dataset/annotations_top50.csv', audio_file=None, batch_size=23, betas=[0.9, 0.999], channels=[64,
+128, 128, 256, 256, 512], checkpoint='out/3^9-model-adamw/epoch-027-loss-0.143123.tar', ckpt_epoch=None, ckpt_map_values=None,
+ckpt_no_loss_fn=False, ckpt_no_optimizer=False, ckpt_no_scheduler=False, data_normalization=True, device='cuda:0', dropout=0.5,
+early_stop_delta=0, early_stop_patience=0, eps=1e-08, eval_threshold=0.3, expansion=2, in_channels=1, layers=[1, 2, 2, 6, 3, 2],
+load_optimal_on_plateau=False, loss='bce', lr=0.01, lr_decay_plateau=0.2, m=3, max_epoch=100, min_lr=1.6e-05, mode='test',
+model='samplecnn', module_filters=[128, 128, 128, 256, 256, 256, 256, 256, 256, 512, 512], momentum=0.9, n=9, n_class=50,
+n_workers=4, name=None, optim_type='sgd', p_data='./dataset/processed', p_out='./eval', plateau_patience=3, samples_in=59049,
+tensorboard_exp_name='adamw', tensorboard_interval=200, weight_decay=0.01, zero_init_residual=False)
+[05/16/21 00:12:03] INFO     Mode selected: test                                                                        main.py:95
+                    INFO     SampleCNN args <n_class=50, m=3, n=9, samples_in=59049, module_filters=[128, 128,   sample_cnn.py:168
+                             128, 256, 256, 256, 256, 256, 256, 512, 512], dropout=0.5, kernel_size=3, stride=3,
+                             padding=1>
+[05/16/21 00:12:05] INFO     Total testing steps: 1884                                                                  eval.py:40
+                    INFO     Testing data size: 43320                                                                   eval.py:41
+                    INFO     Checkpoint loaded. Epoch trained 27, global_i 178983, best val 0.143123                    eval.py:61
+[Test] [1884/1884] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:35 Test loss: 0.252727
+[05/16/21 00:12:40] INFO     waiting for calculating auc/ap scores...                                                  misc.py:401
+[05/16/21 00:12:54] INFO     Testing speed: 0.0260s/it, auc_tag: 0.7422, auc_sample: 0.7833, ap_tag: 0.2352,           eval.py:115
+                             ap_sample: 0.4330
+───────────────────────────────────────────────────────── Task finished ──────────────────────────────────────────────────────────
+
+# AdamW with data normalization
+───────────────────────────────────────────────────── Sample CNN Main Script ─────────────────────────────────────────────────────
+Namespace(annotation_file='./dataset/annotations_top50.csv', audio_file=None, batch_size=23, betas=[0.9, 0.999], channels=[64,
+128, 128, 256, 256, 512], checkpoint='out/3^9-model-adamw-norm/best@epoch-027-loss-0.142773.tar', ckpt_epoch=None,
+ckpt_map_values=None, ckpt_no_loss_fn=False, ckpt_no_optimizer=False, ckpt_no_scheduler=False, data_normalization=True,
+device='cuda:0', dropout=0.5, early_stop_delta=0, early_stop_patience=0, eps=1e-08, eval_threshold=0.3, expansion=2,
+in_channels=1, layers=[1, 2, 2, 6, 3, 2], load_optimal_on_plateau=False, loss='bce', lr=0.01, lr_decay_plateau=0.2, m=3,
+max_epoch=100, min_lr=1.6e-05, mode='test', model='samplecnn', module_filters=[128, 128, 128, 256, 256, 256, 256, 256, 256, 512,
+512], momentum=0.9, n=9, n_class=50, n_workers=4, name=None, optim_type='sgd', p_data='./dataset/processed', p_out='./eval',
+plateau_patience=3, samples_in=59049, tensorboard_exp_name='adamw-norm', tensorboard_interval=200, weight_decay=0.01,
+zero_init_residual=False)
+[05/16/21 17:00:54] INFO     Mode selected: test                                                                        main.py:95
+                    INFO     SampleCNN args <n_class=50, m=3, n=9, samples_in=59049, module_filters=[128, 128,   sample_cnn.py:168
+                             128, 256, 256, 256, 256, 256, 256, 512, 512], dropout=0.5, kernel_size=3, stride=3,
+                             padding=1>
+[05/16/21 17:00:56] INFO     Total testing steps: 1884                                                                  eval.py:40
+                    INFO     Testing data size: 43320                                                                   eval.py:41
+                    INFO     Checkpoint loaded. Epoch trained 27, global_i 178983, best val 0.142773                    eval.py:61
+[Test] [1884/1884] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:34 Test loss: 0.152571
+[05/16/21 17:01:30] INFO     waiting for calculating auc/ap scores...                                                  misc.py:401
+[05/16/21 17:01:42] INFO     Testing speed: 0.0246s/it, auc_tag: 0.8761, auc_sample: 0.9138, ap_tag: 0.3817,           eval.py:115
+                             ap_sample: 0.6499
+───────────────────────────────────────────────────────── Task finished ──────────────────────────────────────────────────────────
+
+# 3^8 model
+───────────────────────────────────────────────────── Sample CNN Main Script ─────────────────────────────────────────────────────
+Namespace(annotation_file='./dataset/annotations_top50.csv', audio_file=None, batch_size=23, betas=[0.9, 0.999], channels=[64,
+128, 128, 256, 256, 512], checkpoint='out/3^8-Model-adamw-lrdecay-0.2/best@epoch-017-loss-0.145101.tar', ckpt_epoch=None,
+ckpt_map_values=None, ckpt_no_loss_fn=False, ckpt_no_optimizer=False, ckpt_no_scheduler=False, data_normalization=True,
+device='cuda:1', dropout=0.5, early_stop_delta=0, early_stop_patience=0, eps=1e-08, eval_threshold=0.3, expansion=2,
+in_channels=1, layers=[1, 2, 2, 6, 3, 2], load_optimal_on_plateau=False, loss='bce', lr=0.01, lr_decay_plateau=0.2, m=3,
+max_epoch=100, min_lr=1.6e-05, mode='test', model='samplecnn', module_filters=[128, 128, 128, 256, 256, 256, 256, 256, 512, 512],
+momentum=0.9, n=8, n_class=50, n_workers=4, name=None, optim_type='sgd', p_data='mtt/processed', p_out='./eval',
+plateau_patience=3, samples_in=59049, tensorboard_exp_name='adamw-norm-decay-0.2', tensorboard_interval=200, weight_decay=0.01,
+zero_init_residual=False)
+[05/16/21 18:04:44] INFO     Mode selected: test                                                                        main.py:95
+                    INFO     SampleCNN args <n_class=50, m=3, n=8, samples_in=59049, module_filters=[128, 128,   sample_cnn.py:168
+                             128, 256, 256, 256, 256, 256, 512, 512], dropout=0.5, kernel_size=9, stride=9,
+                             padding=4>
+[05/16/21 18:04:47] INFO     Total testing steps: 1884                                                                  eval.py:40
+                    INFO     Testing data size: 43320                                                                   eval.py:41
+                    INFO     Checkpoint loaded. Epoch trained 17, global_i 112693, best val 0.145101                    eval.py:61
+[Test] [1884/1884] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:51 Test loss: 0.154700
+[05/16/21 18:05:40] INFO     waiting for calculating auc/ap scores...                                                  misc.py:401
+[05/16/21 18:05:51] INFO     Testing speed: 0.0337s/it, auc_tag: 0.8720, auc_sample: 0.9111, ap_tag: 0.3736,           eval.py:115
+                             ap_sample: 0.6435
+───────────────────────────────────────────────────────── Task finished ──────────────────────────────────────────────────────────
+
+# 3^7 model
+───────────────────────────────────────────────────── Sample CNN Main Script ─────────────────────────────────────────────────────
+Namespace(annotation_file='./dataset/annotations_top50.csv', audio_file=None, batch_size=23, betas=[0.9, 0.999], channels=[64,
+128, 128, 256, 256, 512], checkpoint='out/3^7-Model-adamw-lrdecay-0.2/best@epoch-017-loss-0.147516.tar', ckpt_epoch=None,
+ckpt_map_values=None, ckpt_no_loss_fn=False, ckpt_no_optimizer=False, ckpt_no_scheduler=False, data_normalization=True,
+device='cuda:1', dropout=0.5, early_stop_delta=0, early_stop_patience=0, eps=1e-08, eval_threshold=0.3, expansion=2,
+in_channels=1, layers=[1, 2, 2, 6, 3, 2], load_optimal_on_plateau=False, loss='bce', lr=0.01, lr_decay_plateau=0.2, m=3,
+max_epoch=100, min_lr=1.6e-05, mode='test', model='samplecnn', module_filters=[128, 128, 256, 256, 256, 256, 256, 512, 512],
+momentum=0.9, n=7, n_class=50, n_workers=4, name=None, optim_type='sgd', p_data='mtt/processed', p_out='./eval',
+plateau_patience=3, samples_in=59049, tensorboard_exp_name='adamw-norm-decay-0.2', tensorboard_interval=200, weight_decay=0.01,
+zero_init_residual=False)
+[05/16/21 18:13:23] INFO     Mode selected: test                                                                        main.py:95
+                    INFO     SampleCNN args <n_class=50, m=3, n=7, samples_in=59049, module_filters=[128, 128,   sample_cnn.py:168
+                             256, 256, 256, 256, 256, 512, 512], dropout=0.5, kernel_size=27, stride=27,
+                             padding=13>
+[05/16/21 18:13:27] INFO     Total testing steps: 1884                                                                  eval.py:40
+                    INFO     Testing data size: 43320                                                                   eval.py:41
+                    INFO     Checkpoint loaded. Epoch trained 17, global_i 112693, best val 0.147516                    eval.py:61
+[Test] [1884/1884] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 / 0:00:24 Test loss: 0.157855
+[05/16/21 18:13:52] INFO     waiting for calculating auc/ap scores...                                                  misc.py:401
+[05/16/21 18:14:03] INFO     Testing speed: 0.0188s/it, auc_tag: 0.8671, auc_sample: 0.9057, ap_tag: 0.3578,           eval.py:115
+                             ap_sample: 0.6296
+───────────────────────────────────────────────────────── Task finished ──────────────────────────────────────────────────────────

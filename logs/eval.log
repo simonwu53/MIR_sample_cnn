@@ -1,0 +1,101 @@
+# python main.py --mode eval --audio_file dataset/raw/d/ambient_teknology-the_all_seeing_eye_project-04-confusion_says-262-291.mp3 --checkpoint out/3^9-model-adamw-norm/best@epoch-027-loss-0.142773.tar --eval_threshold 0.3
+───────────────────────────────────────────────────── Sample CNN Main Script ─────────────────────────────────────────────────────
+Namespace(annotation_file='./dataset/annotations_top50.csv',
+audio_file='dataset/raw/d/ambient_teknology-the_all_seeing_eye_project-04-confusion_says-262-291.mp3', batch_size=23, betas=[0.9,
+0.999], channels=[64, 128, 128, 256, 256, 512], checkpoint='out/3^9-model-adamw-norm/best@epoch-027-loss-0.142773.tar',
+ckpt_epoch=None, ckpt_map_values=None, ckpt_no_loss_fn=False, ckpt_no_optimizer=False, ckpt_no_scheduler=False,
+data_normalization=False, device='cuda:0', dropout=0.5, early_stop_delta=0, early_stop_patience=0, eps=1e-08, eval_threshold=0.3,
+expansion=2, in_channels=1, layers=[1, 2, 2, 6, 3, 2], load_optimal_on_plateau=False, loss='bce', lr=0.01, lr_decay_plateau=0.2,
+m=3, max_epoch=100, min_lr=1.6e-05, mode='eval', model='samplecnn', module_filters=[128, 128, 128, 256, 256, 256, 256, 256, 256,
+512, 512], momentum=0.9, n=9, n_class=50, n_workers=4, name=None, optim_type='sgd', p_data='./dataset/processed', p_out='./out',
+plateau_patience=3, samples_in=59049, tensorboard_exp_name='exp1', tensorboard_interval=200, weight_decay=0.01,
+zero_init_residual=False)
+[05/15/21 01:30:44] INFO     Mode selected: eval                                                                        main.py:95
+                    INFO     SampleCNN args <n_class=50, m=3, n=9, samples_in=59049, module_filters=[128, 128,   sample_cnn.py:168
+                             128, 256, 256, 256, 256, 256, 256, 512, 512], dropout=0.5, kernel_size=3, stride=3,
+                             padding=1>
+[05/15/21 01:30:47] INFO     Song info:       clip_id                                           mp3_path split         eval.py:152
+                             title             artist   idx
+                             6254    17125  d/ambient_teknology-the_all_seeing_eye_project...  test  Confusion Says
+                             Ambient Teknology  6254
+                    INFO     Number of segments: 10                                                                    eval.py:153
+                    INFO     Ground truth tags: ['techno' 'electronic' 'rock' 'fast' 'beat']                           eval.py:154
+                    INFO     Positive tag threshold: 0.3                                                               eval.py:155
+                    INFO     Checkpoint loaded. Epoch trained 27, global_i 178983, best val 0.142773                   eval.py:173
+           tags  freq
+8          fast   7.0
+1     classical   4.0
+3        techno   4.0
+6    electronic   3.0
+4       strings   1.0
+22  harpsichord   1.0
+                    INFO     Testing speed: 0.0191s, loss: 0.2729184925556183,                                         eval.py:200
+───────────────────────────────────────────────────────── Task finished ──────────────────────────────────────────────────────────
+
+# python main.py --mode eval --audio_file dataset/raw/e/atomic_opera-penguin_dust-05-godofhate-146-175.mp3 --checkpoint out/3^9-model-adamw-norm/best@epoch-027-loss-0.142773.tar --eval_threshold 0.3
+───────────────────────────────────────────────────── Sample CNN Main Script ─────────────────────────────────────────────────────
+Namespace(annotation_file='./dataset/annotations_top50.csv',
+audio_file='dataset/raw/e/atomic_opera-penguin_dust-05-godofhate-146-175.mp3', batch_size=23, betas=[0.9, 0.999], channels=[64,
+128, 128, 256, 256, 512], checkpoint='out/3^9-model-adamw-norm/best@epoch-027-loss-0.142773.tar', ckpt_epoch=None,
+ckpt_map_values=None, ckpt_no_loss_fn=False, ckpt_no_optimizer=False, ckpt_no_scheduler=False, data_normalization=False,
+device='cuda:0', dropout=0.5, early_stop_delta=0, early_stop_patience=0, eps=1e-08, eval_threshold=0.3, expansion=2,
+in_channels=1, layers=[1, 2, 2, 6, 3, 2], load_optimal_on_plateau=False, loss='bce', lr=0.01, lr_decay_plateau=0.2, m=3,
+max_epoch=100, min_lr=1.6e-05, mode='eval', model='samplecnn', module_filters=[128, 128, 128, 256, 256, 256, 256, 256, 256, 512,
+512], momentum=0.9, n=9, n_class=50, n_workers=4, name=None, optim_type='sgd', p_data='./dataset/processed', p_out='./out',
+plateau_patience=3, samples_in=59049, tensorboard_exp_name='exp1', tensorboard_interval=200, weight_decay=0.01,
+zero_init_residual=False)
+[05/15/21 01:40:14] INFO     Mode selected: eval                                                                        main.py:95
+                    INFO     SampleCNN args <n_class=50, m=3, n=9, samples_in=59049, module_filters=[128, 128,   sample_cnn.py:168
+                             128, 256, 256, 256, 256, 256, 256, 512, 512], dropout=0.5, kernel_size=3, stride=3,
+                             padding=1>
+[05/15/21 01:40:17] INFO     Song info:       clip_id                                           mp3_path split         eval.py:151
+                             title        artist   idx
+                             8263    22594  e/atomic_opera-penguin_dust-05-godofhate-146-1...  test  GodOfHate  Atomic
+                             Opera  8263
+                    INFO     Number of segments: 10                                                                    eval.py:152
+                    INFO     Ground truth tags: ['rock' 'loud']                                                        eval.py:153
+                    INFO     Positive tag threshold: 0.3                                                               eval.py:154
+                    INFO     Checkpoint loaded. Epoch trained 27, global_i 178983, best val 0.142773                   eval.py:172
+         tags  freq
+7        rock   6.0
+0      guitar   5.0
+1   classical   2.0
+4     strings   1.0
+12     violin   1.0
+17      opera   1.0
+                    INFO     Testing speed: 0.0191s, loss: 0.16680572926998138,                                        eval.py:199
+───────────────────────────────────────────────────────── Task finished ──────────────────────────────────────────────────────────
+
+# python main.py --mode eval --audio_file dataset/raw/f/american_baroque-the_four_seasons_by_vivaldi-02-concerto_no_1_in_d_major_rv_269_spring__largo-88-117.mp3 --checkpoint out/3^9-model-adamw-norm/best@epoch-027-loss-0.142773.tar --eval_threshold 0.3
+───────────────────────────────────────────────────── Sample CNN Main Script ─────────────────────────────────────────────────────
+Namespace(annotation_file='./dataset/annotations_top50.csv', audio_file='dataset/raw/f/american_baroque-the_four_seasons_by_vivald
+i-02-concerto_no_1_in_d_major_rv_269_spring__largo-88-117.mp3', batch_size=23, betas=[0.9, 0.999], channels=[64, 128, 128, 256,
+256, 512], checkpoint='out/3^9-model-adamw-norm/best@epoch-027-loss-0.142773.tar', ckpt_epoch=None, ckpt_map_values=None,
+ckpt_no_loss_fn=False, ckpt_no_optimizer=False, ckpt_no_scheduler=False, data_normalization=False, device='cuda:0', dropout=0.5,
+early_stop_delta=0, early_stop_patience=0, eps=1e-08, eval_threshold=0.3, expansion=2, in_channels=1, layers=[1, 2, 2, 6, 3, 2],
+load_optimal_on_plateau=False, loss='bce', lr=0.01, lr_decay_plateau=0.2, m=3, max_epoch=100, min_lr=1.6e-05, mode='eval',
+model='samplecnn', module_filters=[128, 128, 128, 256, 256, 256, 256, 256, 256, 512, 512], momentum=0.9, n=9, n_class=50,
+n_workers=4, name=None, optim_type='sgd', p_data='./dataset/processed', p_out='./out', plateau_patience=3, samples_in=59049,
+tensorboard_exp_name='exp1', tensorboard_interval=200, weight_decay=0.01, zero_init_residual=False)
+[05/15/21 01:41:55] INFO     Mode selected: eval                                                                        main.py:95
+                    INFO     SampleCNN args <n_class=50, m=3, n=9, samples_in=59049, module_filters=[128, 128,   sample_cnn.py:168
+                             128, 256, 256, 256, 256, 256, 256, 512, 512], dropout=0.5, kernel_size=3, stride=3,
+                             padding=1>
+[05/15/21 01:41:58] INFO     Song info:       clip_id                                           mp3_path split         eval.py:151
+                             title            artist   idx
+                             2459     6701  f/american_baroque-the_four_seasons_by_vivaldi...  test  Concerto No.1 in
+                             D Major RV 269 _SPRING_ - Largo  American Baroque  2459
+                    INFO     Number of segments: 10                                                                    eval.py:152
+                    INFO     Ground truth tags: ['classical' 'strings' 'violin' 'flute']                               eval.py:153
+                    INFO     Positive tag threshold: 0.3                                                               eval.py:154
+                    INFO     Checkpoint loaded. Epoch trained 27, global_i 178983, best val 0.142773                   eval.py:172
+         tags  freq
+1   classical  10.0
+4     strings   7.0
+12     violin   6.0
+17      opera   6.0
+2        slow   2.0
+35      choir   2.0
+49     choral   1.0
+                    INFO     Testing speed: 0.0218s, loss: 0.1495215743780136,                                         eval.py:199
+───────────────────────────────────────────────────────── Task finished ──────────────────────────────────────────────────────────
