@@ -132,7 +132,7 @@ dataset
 ## Future Works
 * Optimized dataset preprocessing (save the processed audio in an effective way both in terms of the 
   space consumption and the loading speed)
-* Other possible auto-tagging models for raw waveforms
+* Other possible auto-tagging models for raw waveforms (e.g. the successor [Sample-CNN][7] model).
 
 
 [1]: https://pytorch.org/
@@ -141,3 +141,4 @@ dataset
 [4]: https://github.com/tae-jun/sample-cnn
 [5]: https://mirg.city.ac.uk/codeapps/the-magnatagatune-dataset
 [6]: https://github.com/keunwoochoi/magnatagatune-list
+[7]: https://github.com/tae-jun/resemul
